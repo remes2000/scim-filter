@@ -1,0 +1,23 @@
+{
+  "name": "scim-filter",
+  "version": "1.0.0",
+  "description": "SCIM filter parser with no dependencies",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "ci": "pnpm build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "SCIM",
+    "filter",
+    "parser",
+    "JSON",
+    "no dependencies"
+  ],
+  "author": "Michal Nieruchalski <nieruchalskimichal@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}
