@@ -19,3 +19,7 @@ TBD
 ## License
 
 This project is licensed under the MIT License.
+
+## Notes
+
+https://datatracker.ietf.org/doc/html/rfc7644#section-3.4.2.2
