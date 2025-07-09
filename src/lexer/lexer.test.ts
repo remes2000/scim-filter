@@ -220,6 +220,67 @@ const testCases: { input: string; expectedTokens: Token[] }[] = [
       { type: 'CloseSquareParenthesis', value: ']' },
       { type: 'EOT' }
     ]
+  },
+  // Additional test cases
+  {
+    input: 'active eq true',
+    expectedTokens: [
+      { type: 'Identifier', value: 'active' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Boolean', value: true },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'active eq false',
+    expectedTokens: [
+      { type: 'Identifier', value: 'active' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Boolean', value: false },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'active eq null',
+    expectedTokens: [
+      { type: 'Identifier', value: 'active' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Null', value: null },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'age lt 40',
+    expectedTokens: [
+      { type: 'Identifier', value: 'age' },
+      { type: 'Operator', value: 'lt' },
+      { type: 'Number', value: '40' },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'not(userType eq "Employee")',
+    expectedTokens: [
+      { type: 'LogicalOperator', value: 'not' },
+      { type: 'OpenParenthesis', value: '(' },
+      { type: 'Identifier', value: 'userType' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'String', value: 'Employee' },
+      { type: 'CloseParenthesis', value: ')' },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'not (userType eq "Employee")',
+    expectedTokens: [
+      { type: 'LogicalOperator', value: 'not' },
+      { type: 'OpenParenthesis', value: '(' },
+      { type: 'Identifier', value: 'userType' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'String', value: 'Employee' },
+      { type: 'CloseParenthesis', value: ')' },
+      { type: 'EOT' }
+    ]
   }
 ];
 
@@ -235,8 +296,4 @@ describe('SCIM Filter Lexer', () => {
 TODO: test cases
 - Empty input
 - Only whitespace
-- value as number
-- value as boolean (true/false)
-- value as null
-- spaces are optional after not operator
 */

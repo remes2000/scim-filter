@@ -1,5 +1,3 @@
-type LexerState = 'filter' | 'operator' | 'value' | 'stringValue' | 'logicalOperator' | 'ignoreSpace'
-
 type Token = IdentifierToken | StringValueToken | BooleanValueToken | NumberValueToken | NullValueToken | OperatorToken | LogicalOperatorToken | EOTToken | OpenParenthesis | CloseParenthesis | OpenSquareParenthesis | CloseSquareParenthesis;
 type Operator = 'eq' | 'ne' | 'co' | 'sw' | 'ew' | 'pr' | 'gt' | 'ge' | 'lt' | 'le';
 type CompareLogicalOperator = 'and' | 'or';
@@ -33,7 +31,7 @@ interface BooleanValueToken {
 
 interface NumberValueToken {
   type: 'Number';
-  value: number;
+  value: string;
 }
 
 interface NullValueToken {
@@ -84,7 +82,6 @@ class Lexer {
   parse(): Token[] {
     [...this.input.split(''), null].forEach((char) => {
       this.state = this.state.handle(char);
-      console.log(this.state.tokens);
     });
     return [...this.state.tokens, { type: 'EOT' }];
   }
@@ -115,6 +112,12 @@ class FilterState implements State {
       return new FilterState(this.tokens);
     }
     if (char === '(') {
+      if (this.memory === NEGATION_LOGICAL_OPERATOR) {
+        this.tokens.push({ type: 'LogicalOperator', value: this.memory });
+        this.tokens.push({ type: 'OpenParenthesis', value: '(' });
+        return new FilterState(this.tokens);
+      }
+
       this.tokens.push({ type: 'OpenParenthesis', value: '(' });
       return new FilterState(this.tokens);
     }
@@ -151,7 +154,19 @@ class ValueState implements State {
 
   handle(char: string | null) {
     if (char === SP || char === null) {
-      /* TODO: handle nulls and booleans */
+      if (this.memory === 'true') {
+        this.tokens.push({ type: 'Boolean', value: true });
+      } else if (this.memory === 'false') {
+        this.tokens.push({ type: 'Boolean', value: false });
+      } else if (this.memory === 'null') {
+        this.tokens.push({ type: 'Null', value: null });
+      } else if (!isNaN(Number(this.memory))) {
+        // TODO: Handle the number according to the protocol. Allow everything that JSON does.
+        this.tokens.push({ type: 'Number', value: this.memory });
+      } else {
+        // TODO: Define good error type
+        throw new Error(`${this.memory} is not a valid value`);
+      }
       return new CompareLogicalOperatorState(this.tokens);
     } if (this.memory === '' && char === QUOTE) {
       return new StringValueState(this.tokens);
