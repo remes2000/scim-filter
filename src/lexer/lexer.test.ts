@@ -139,6 +139,88 @@ const testCases: { input: string; expectedTokens: Token[] }[] = [
       { type: 'EOT' }
     ]
   },
+  {
+    input: 'userType ne "Employee" and not (emails co "example.com" or emails.value co "example.org")',
+    expectedTokens: [
+      { type: 'Identifier', value: 'userType' },
+      { type: 'Operator', value: 'ne' },
+      { type: 'String', value: 'Employee' },
+      { type: 'LogicalOperator', value: 'and' },
+      { type: 'LogicalOperator', value: 'not' },
+      { type: 'OpenParenthesis', value: '(' },
+      { type: 'Identifier', value: 'emails' },
+      { type: 'Operator', value: 'co' },
+      { type: 'String', value: 'example.com' },
+      { type: 'LogicalOperator', value: 'or' },
+      { type: 'Identifier', value: 'emails.value' },
+      { type: 'Operator', value: 'co' },
+      { type: 'String', value: 'example.org' },
+      { type: 'CloseParenthesis', value: ')' },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'userType eq "Employee" and (emails.type eq "work")',
+    expectedTokens: [
+      { type: 'Identifier', value: 'userType' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'String', value: 'Employee' },
+      { type: 'LogicalOperator', value: 'and' },
+      { type: 'OpenParenthesis', value: '(' },
+      { type: 'Identifier', value: 'emails.type' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'String', value: 'work' },
+      { type: 'CloseParenthesis', value: ')' },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'userType eq "Employee" and emails[type eq "work" and value co "@example.com"]',
+    expectedTokens: [
+      { type: 'Identifier', value: 'userType' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'String', value: 'Employee' },
+      { type: 'LogicalOperator', value: 'and' },
+      { type: 'Identifier', value: 'emails' },
+      { type: 'OpenSquareParenthesis', value: '[' },
+      { type: 'Identifier', value: 'type' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'String', value: 'work' },
+      { type: 'LogicalOperator', value: 'and' },
+      { type: 'Identifier', value: 'value' },
+      { type: 'Operator', value: 'co' },
+      { type: 'String', value: '@example.com' },
+      { type: 'CloseSquareParenthesis', value: ']' },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'emails[type eq "work" and value co "@example.com"] or ims[type eq "xmpp" and value co "@foo.com"]',
+    expectedTokens: [
+      { type: 'Identifier', value: 'emails' },
+      { type: 'OpenSquareParenthesis', value: '[' },
+      { type: 'Identifier', value: 'type' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'String', value: 'work' },
+      { type: 'LogicalOperator', value: 'and' },
+      { type: 'Identifier', value: 'value' },
+      { type: 'Operator', value: 'co' },
+      { type: 'String', value: '@example.com' },
+      { type: 'CloseSquareParenthesis', value: ']' },
+      { type: 'LogicalOperator', value: 'or' },
+      { type: 'Identifier', value: 'ims' },
+      { type: 'OpenSquareParenthesis', value: '[' },
+      { type: 'Identifier', value: 'type' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'String', value: 'xmpp' },
+      { type: 'LogicalOperator', value: 'and' },
+      { type: 'Identifier', value: 'value' },
+      { type: 'Operator', value: 'co' },
+      { type: 'String', value: '@foo.com' },
+      { type: 'CloseSquareParenthesis', value: ']' },
+      { type: 'EOT' }
+    ]
+  }
 ];
 
 describe('SCIM Filter Lexer', () => {
@@ -156,4 +238,5 @@ TODO: test cases
 - value as number
 - value as boolean (true/false)
 - value as null
+- spaces are optional after not operator
 */
