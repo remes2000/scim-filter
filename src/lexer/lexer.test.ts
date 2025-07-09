@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { Lexer, Token } from './lexer';
+import { Lexer, Token, LexerError, LexerErrorType, InvalidOperatorError, InvalidValueError, UnterminatedStringError, InvalidLogicalOperatorError, MissingParenthesisAfterNotError, UnexpectedEndOfInputError } from './lexer';
 
 const check = (input: string, tokens: Token[]) => {
   const lexer = new Lexer(input);
@@ -291,6 +291,57 @@ describe('SCIM Filter Lexer', () => {
     });
   });
 });
+
+// These tests are AI generated. I have to carefully review them:
+
+// describe('SCIM Filter Lexer - Error Handling', () => {
+//   it('should throw InvalidOperatorError for invalid operator', () => {
+//     const lexer = new Lexer('userName invalid "value"');
+//     expect(() => lexer.parse()).toThrow(InvalidOperatorError);
+//     expect(() => lexer.parse()).toThrow('is not a valid operator');
+//   });
+
+//   it('should throw InvalidValueError for invalid value', () => {
+//     const lexer = new Lexer('userName eq invalidValue');
+//     expect(() => lexer.parse()).toThrow(InvalidValueError);
+//     expect(() => lexer.parse()).toThrow('is not a valid value');
+//   });
+
+//   it('should throw UnterminatedStringError for unterminated string', () => {
+//     const lexer = new Lexer('userName eq "unterminated');
+//     expect(() => lexer.parse()).toThrow(UnterminatedStringError);
+//     expect(() => lexer.parse()).toThrow('Unterminated string literal');
+//   });
+
+//   it('should throw InvalidLogicalOperatorError for invalid logical operator', () => {
+//     const lexer = new Lexer('userName eq "test" invalid');
+//     expect(() => lexer.parse()).toThrow(InvalidLogicalOperatorError);
+//     expect(() => lexer.parse()).toThrow('is not a valid logical operator');
+//   });
+
+//   it('should throw MissingParenthesisAfterNotError when not is not followed by parenthesis', () => {
+//     const lexer = new Lexer('not userName eq "test"');
+//     expect(() => lexer.parse()).toThrow(MissingParenthesisAfterNotError);
+//     expect(() => lexer.parse()).toThrow('Expected \'(\' after \'not\' operator');
+//   });
+
+//   it('should throw UnexpectedEndOfInputError for incomplete input', () => {
+//     const lexer = new Lexer('userName eq "test" incomplete');
+//     expect(() => lexer.parse()).toThrow(UnexpectedEndOfInputError);
+//     expect(() => lexer.parse()).toThrow('Unexpected end of input');
+//   });
+
+//   it('should provide error type information', () => {
+//     const lexer = new Lexer('userName invalid "value"');
+//     try {
+//       lexer.parse();
+//     } catch (error) {
+//       expect(error).toBeInstanceOf(LexerError);
+//       expect((error as LexerError).errorType).toBe(LexerErrorType.INVALID_OPERATOR);
+//       expect((error as LexerError).expected).toEqual(['eq', 'ne', 'co', 'sw', 'ew', 'gt', 'ge', 'lt', 'le', 'pr']);
+//     }
+//   });
+// });
 
 /* 
 TODO: test cases
