@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { Lexer, Token, LexerError, LexerErrorType, InvalidOperatorError, InvalidValueError, UnterminatedStringError, InvalidLogicalOperatorError, MissingParenthesisAfterNotError, UnexpectedEndOfInputError } from './lexer';
+import { Lexer, Token } from './lexer';
+import { InvalidOperatorError, InvalidValueError } from './errors';
 
 const check = (input: string, tokens: Token[]) => {
   const lexer = new Lexer(input);
@@ -292,20 +293,18 @@ describe('SCIM Filter Lexer', () => {
   });
 });
 
-// These tests are AI generated. I have to carefully review them:
+describe('SCIM Filter Lexer - Error Handling', () => {
+  it('should throw InvalidOperatorError for invalid operator', () => {
+    const input = 'userName invalid "value"';
+    expect(() => new Lexer(input).parse()).toThrow(InvalidOperatorError);
+    expect(() => new Lexer(input).parse()).toThrow(expect.objectContaining({ position: 9 }));
+  });
 
-// describe('SCIM Filter Lexer - Error Handling', () => {
-//   it('should throw InvalidOperatorError for invalid operator', () => {
-//     const lexer = new Lexer('userName invalid "value"');
-//     expect(() => lexer.parse()).toThrow(InvalidOperatorError);
-//     expect(() => lexer.parse()).toThrow('is not a valid operator');
-//   });
-
-//   it('should throw InvalidValueError for invalid value', () => {
-//     const lexer = new Lexer('userName eq invalidValue');
-//     expect(() => lexer.parse()).toThrow(InvalidValueError);
-//     expect(() => lexer.parse()).toThrow('is not a valid value');
-//   });
+  it('should throw InvalidValueError for invalid value', () => {
+    const input = 'userName eq trueee';
+    expect(() => new Lexer(input).parse()).toThrow(InvalidValueError);
+    expect(() => new Lexer(input).parse()).toThrow(expect.objectContaining({ position: 12 }));
+  });
 
 //   it('should throw UnterminatedStringError for unterminated string', () => {
 //     const lexer = new Lexer('userName eq "unterminated');
@@ -341,7 +340,7 @@ describe('SCIM Filter Lexer', () => {
 //       expect((error as LexerError).expected).toEqual(['eq', 'ne', 'co', 'sw', 'ew', 'gt', 'ge', 'lt', 'le', 'pr']);
 //     }
 //   });
-// });
+});
 
 /* 
 TODO: test cases

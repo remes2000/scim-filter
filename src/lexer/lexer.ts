@@ -1,170 +1,9 @@
-type Token = IdentifierToken | StringValueToken | BooleanValueToken | NumberValueToken | NullValueToken | OperatorToken | LogicalOperatorToken | EOTToken | OpenParenthesis | CloseParenthesis | OpenSquareParenthesis | CloseSquareParenthesis;
-type Operator = 'eq' | 'ne' | 'co' | 'sw' | 'ew' | 'pr' | 'gt' | 'ge' | 'lt' | 'le';
-type CompareLogicalOperator = 'and' | 'or';
-type LogicalOperator = CompareLogicalOperator | 'not';
+import { Operator, CompareLogicalOperator, Token } from './types';
+import { COMPARE_LOGICAL_OPERATORS, COMPARE_OPERATORS, NEGATION_LOGICAL_OPERATOR, OPERATORS, QUOTE, SP } from './constants';
+import { InvalidCompareLogicalOperator, InvalidOperatorError, InvalidValueError, MissingParenthesisAfterNotError, UnexpectedEndOfInputError, UnterminatedStringError } from './errors';
 
-// TODO: call those COMPARE_OPERATORS
-const VALUE_REQUIRED_OPERATORS = ['eq', 'ne', 'co', 'sw', 'ew', 'gt', 'ge', 'lt', 'le'];
-const NO_VALUE_OPERATORS = ['pr'];
-const OPERATORS = [...VALUE_REQUIRED_OPERATORS, ...NO_VALUE_OPERATORS];
 const isOperator = (value: string): value is Operator => OPERATORS.includes(value);
-const COMPARE_LOGICAL_OPERATORS = ['and', 'or'];
-const NEGATION_LOGICAL_OPERATOR = 'not';
 const isCompareLogicalOperator = (value: string): value is CompareLogicalOperator => COMPARE_LOGICAL_OPERATORS.includes(value);
-const SP = ' ';
-const QUOTE = '"';
-
-enum LexerErrorType {
-  INVALID_OPERATOR = 'INVALID_OPERATOR',
-  INVALID_VALUE = 'INVALID_VALUE',
-  UNTERMINATED_STRING = 'UNTERMINATED_STRING',
-  INVALID_LOGICAL_OPERATOR = 'INVALID_LOGICAL_OPERATOR',
-  MISSING_PARENTHESIS_AFTER_NOT = 'MISSING_PARENTHESIS_AFTER_NOT',
-  UNEXPECTED_END_OF_INPUT = 'UNEXPECTED_END_OF_INPUT'
-}
-
-class LexerError extends Error {
-  constructor(
-    public readonly errorType: LexerErrorType,
-    message: string,
-    public readonly position?: number,
-    public readonly token?: string,
-    public readonly expected?: string[]
-  ) {
-    super(message);
-    this.name = 'LexerError';
-  }
-}
-
-class InvalidOperatorError extends LexerError {
-  constructor(operator: string, position?: number) {
-    super(
-      LexerErrorType.INVALID_OPERATOR,
-      `'${operator}' is not a valid operator. Expected one of: ${OPERATORS.join(', ')}`,
-      position,
-      operator,
-      OPERATORS
-    );
-  }
-}
-
-class InvalidValueError extends LexerError {
-  constructor(value: string, position?: number) {
-    super(
-      LexerErrorType.INVALID_VALUE,
-      `'${value}' is not a valid value. Expected a string (quoted), boolean (true/false), null, or number`,
-      position,
-      value,
-      ['string', 'true', 'false', 'null', 'number']
-    );
-  }
-}
-
-class UnterminatedStringError extends LexerError {
-  constructor(position?: number) {
-    super(
-      LexerErrorType.UNTERMINATED_STRING,
-      'Unterminated string literal. Expected closing quote',
-      position
-    );
-  }
-}
-
-class InvalidLogicalOperatorError extends LexerError {
-  constructor(operator: string, position?: number) {
-    super(
-      LexerErrorType.INVALID_LOGICAL_OPERATOR,
-      `'${operator}' is not a valid logical operator. Expected one of: ${COMPARE_LOGICAL_OPERATORS.join(', ')}`,
-      position,
-      operator,
-      COMPARE_LOGICAL_OPERATORS
-    );
-  }
-}
-
-class MissingParenthesisAfterNotError extends LexerError {
-  constructor(char: string | null, position?: number) {
-    super(
-      LexerErrorType.MISSING_PARENTHESIS_AFTER_NOT,
-      `Expected '(' after 'not' operator, got '${char}'`,
-      position,
-      char || 'null',
-      ['(']
-    );
-  }
-}
-
-class UnexpectedEndOfInputError extends LexerError {
-  constructor(memory: string, position?: number) {
-    super(
-      LexerErrorType.UNEXPECTED_END_OF_INPUT,
-      `Unexpected end of input, expected logical operator, got '${memory}'`,
-      position,
-      memory,
-      COMPARE_LOGICAL_OPERATORS
-    );
-  }
-}
-
-interface IdentifierToken {
-  type: 'Identifier';
-  value: string;
-}
-
-interface StringValueToken {
-  type: 'String';
-  value: string;
-}
-
-interface BooleanValueToken {
-  type: 'Boolean',
-  value: boolean;
-}
-
-interface NumberValueToken {
-  type: 'Number';
-  value: string;
-}
-
-interface NullValueToken {
-  type: 'Null';
-  value: null;
-}
-
-interface OperatorToken {
-  type: 'Operator';
-  value: Operator;
-}
-
-interface LogicalOperatorToken {
-  type: 'LogicalOperator';
-  value: LogicalOperator;
-}
-
-/* TODO: maybe one token will be enough */
-interface OpenParenthesis {
-  type: 'OpenParenthesis';
-  value: '(';
-}
-
-interface CloseParenthesis {
-  type: 'CloseParenthesis';
-  value: ')';
-}
-
-interface OpenSquareParenthesis {
-  type: 'OpenSquareParenthesis';
-  value: '[';
-}
-
-interface CloseSquareParenthesis {
-  type: 'CloseSquareParenthesis';
-  value: ']';
-}
-
-interface EOTToken {
-  type: 'EOT';
-}
 
 class Lexer {
   private state: State = new FilterState([]);
@@ -192,6 +31,7 @@ class FilterState implements State {
   constructor(readonly tokens: Token[]) {};
 
   handle(char: string | null, position: number): State {
+    /* TODO: throw on empty string */
     if (char === SP || char === null) {
       if (this.memory === NEGATION_LOGICAL_OPERATOR) {
         this.tokens.push({ type: 'LogicalOperator', value: this.memory });
@@ -229,11 +69,11 @@ class OperatorState implements State {
     if (char === SP || char === null) {
       const operator = this.memory;
       if (!isOperator(operator)) {
-        throw new InvalidOperatorError(this.memory, position);
+        throw new InvalidOperatorError(this.memory, position - this.memory.length);
       }
 
       this.tokens.push({ type: 'Operator', value: operator });
-      return VALUE_REQUIRED_OPERATORS.includes(operator) ? new ValueState(this.tokens) : new CompareLogicalOperatorState(this.tokens);
+      return COMPARE_OPERATORS.includes(operator) ? new ValueState(this.tokens) : new CompareLogicalOperatorState(this.tokens);
     }
 
     this.memory += char;
@@ -258,7 +98,7 @@ class ValueState implements State {
         // TODO: Handle the number according to the protocol. Allow everything that JSON does.
         this.tokens.push({ type: 'Number', value: this.memory });
       } else {
-        throw new InvalidValueError(this.memory, position);
+        throw new InvalidValueError(this.memory, position - this.memory.length);
       }
       return new CompareLogicalOperatorState(this.tokens);
     } if (this.memory === '' && char === QUOTE) {
@@ -300,7 +140,7 @@ class CompareLogicalOperatorState implements State {
         // End of input :)
         return this;
       }
-      throw new UnexpectedEndOfInputError(this.memory, position);
+      throw new UnexpectedEndOfInputError(position);
     }
 
     if (char === SP) {
@@ -311,7 +151,7 @@ class CompareLogicalOperatorState implements State {
 
       const operator = this.memory;
       if (!isCompareLogicalOperator(operator)) {
-        throw new InvalidLogicalOperatorError(operator, position);
+        throw new InvalidCompareLogicalOperator(operator, position);
       }
       this.tokens.push({ type: 'LogicalOperator', value: operator });
       return new FilterState(this.tokens);
@@ -350,13 +190,5 @@ class ParenthesisAfterNegationState implements State {
 
 export {
   Lexer,
-  Token,
-  LexerError,
-  LexerErrorType,
-  InvalidOperatorError,
-  InvalidValueError,
-  UnterminatedStringError,
-  InvalidLogicalOperatorError,
-  MissingParenthesisAfterNotError,
-  UnexpectedEndOfInputError
+  Token
 };
