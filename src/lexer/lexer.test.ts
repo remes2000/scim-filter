@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Lexer, Token } from './lexer';
-import { InvalidOperatorError, InvalidValueError } from './errors';
+import { InvalidCompareLogicalOperator, InvalidOperatorError, InvalidValueError, UnterminatedStringError } from './errors';
 
 const check = (input: string, tokens: Token[]) => {
   const lexer = new Lexer(input);
@@ -306,17 +306,17 @@ describe('SCIM Filter Lexer - Error Handling', () => {
     expect(() => new Lexer(input).parse()).toThrow(expect.objectContaining({ position: 12 }));
   });
 
-//   it('should throw UnterminatedStringError for unterminated string', () => {
-//     const lexer = new Lexer('userName eq "unterminated');
-//     expect(() => lexer.parse()).toThrow(UnterminatedStringError);
-//     expect(() => lexer.parse()).toThrow('Unterminated string literal');
-//   });
+  it('should throw UnterminatedStringError for unterminated string', () => {
+    const input = 'userName eq "pies';
+    expect(() => new Lexer(input).parse()).toThrow(UnterminatedStringError);
+    expect(() => new Lexer(input).parse()).toThrow(expect.objectContaining({ position: 12 }));
+  });
 
-//   it('should throw InvalidLogicalOperatorError for invalid logical operator', () => {
-//     const lexer = new Lexer('userName eq "test" invalid');
-//     expect(() => lexer.parse()).toThrow(InvalidLogicalOperatorError);
-//     expect(() => lexer.parse()).toThrow('is not a valid logical operator');
-//   });
+  it('should throw InvalidLogicalOperatorError for invalid logical operator', () => {
+    const input = 'userName eq "test" invalid';
+    expect(() => new Lexer(input).parse()).toThrow(InvalidCompareLogicalOperator);
+    expect(() => new Lexer(input).parse()).toThrow(expect.objectContaining({ position: 19 }));
+  });
 
 //   it('should throw MissingParenthesisAfterNotError when not is not followed by parenthesis', () => {
 //     const lexer = new Lexer('not userName eq "test"');
@@ -346,4 +346,6 @@ describe('SCIM Filter Lexer - Error Handling', () => {
 TODO: test cases
 - Empty input
 - Only whitespace
+- Only alphanumeric characters
+- JSON numbers
 */

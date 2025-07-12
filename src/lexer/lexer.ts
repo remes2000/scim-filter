@@ -121,7 +121,7 @@ class StringValueState implements State {
       this.tokens.push({ type: 'String', value: this.memory });
       return new CompareLogicalOperatorState(this.tokens);
     } else if (char === null) {
-      throw new UnterminatedStringError(position);
+      throw new UnterminatedStringError(position - this.memory.length - 1);
     } else {
       this.memory += char;
       return this;
