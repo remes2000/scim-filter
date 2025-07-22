@@ -1,5 +1,6 @@
 export type Token = 
   | IdentifierToken 
+  | DotToken
   | StringValueToken 
   | BooleanValueToken 
   | NumberValueToken 
@@ -19,6 +20,11 @@ export type LogicalOperator = CompareLogicalOperator | 'not';
 export interface IdentifierToken {
   type: 'Identifier';
   value: string;
+}
+
+export interface DotToken {
+  type: 'Dot';
+  value: '.';
 }
 
 export interface StringValueToken {
