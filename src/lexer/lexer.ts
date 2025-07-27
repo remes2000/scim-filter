@@ -110,10 +110,22 @@ class IdentifierState implements State {
     }
     if (this.memory === 'true' || this.memory === 'false') {
       this.tokens.push({ type: 'Boolean', value: this.memory === 'true' });
+      if (char === ')') {
+        this.tokens.push({ type: 'CloseParenthesis', value: ')' });
+      }
+      if (char === ']') {
+        this.tokens.push({ type: 'CloseSquareParenthesis', value: ']' });
+      }
       return new DefaultState(this.tokens);
     }
     if (this.memory === 'null') {
       this.tokens.push({ type: 'Null', value: null });
+      if (char === ')') {
+        this.tokens.push({ type: 'CloseParenthesis', value: ')' });
+      }
+      if (char === ']') {
+        this.tokens.push({ type: 'CloseSquareParenthesis', value: ']' });
+      }
       return new DefaultState(this.tokens);
     }
     this.tokens.push({ type: 'Identifier', value: this.memory });
@@ -163,6 +175,12 @@ class NumberState implements State {
       return this;
     }
     this.tokens.push({ type: 'Number', value: this.memory });
+    if (char === ')') {
+      this.tokens.push({ type: 'CloseParenthesis', value: ')' });
+    }
+    if (char === ']') {
+      this.tokens.push({ type: 'CloseSquareParenthesis', value: ']' });
+    }
     return new DefaultState(this.tokens);
   }
 }

@@ -299,6 +299,75 @@ const testCases: { input: string; expectedTokens: Token[] }[] = [
       { type: 'CloseParenthesis', value: ')' },
       { type: 'EOT' }
     ]
+  },
+  {
+    input: '(age lt 25)',
+    expectedTokens: [
+      { type: 'OpenParenthesis', value: '(' },
+      { type: 'Identifier', value: 'age' },
+      { type: 'Operator', value: 'lt' },
+      { type: 'Number', value: '25' },
+      { type: 'CloseParenthesis', value: ')' },
+      { type: 'EOT' } 
+    ]
+  },
+  {
+    input: '(isAdult eq true)',
+    expectedTokens: [
+      { type: 'OpenParenthesis', value: '(' },
+      { type: 'Identifier', value: 'isAdult' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Boolean', value: true },
+      { type: 'CloseParenthesis', value: ')' },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: '(parent eq null)',
+    expectedTokens: [
+      { type: 'OpenParenthesis', value: '(' },
+      { type: 'Identifier', value: 'parent' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Null', value: null },
+      { type: 'CloseParenthesis', value: ')' },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'emails[numOfRecipients gt 0]',
+    expectedTokens: [
+      { type: 'Identifier', value: 'emails' },
+      { type: 'OpenSquareParenthesis', value: '[' },
+      { type: 'Identifier', value: 'numOfRecipients' },
+      { type: 'Operator', value: 'gt' },
+      { type: 'Number', value: '0' },
+      { type: 'CloseSquareParenthesis', value: ']' },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'emails[spam eq false]',
+    expectedTokens: [
+      { type: 'Identifier', value: 'emails' },
+      { type: 'OpenSquareParenthesis', value: '[' },
+      { type: 'Identifier', value: 'spam' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Boolean', value: false },
+      { type: 'CloseSquareParenthesis', value: ']' },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'emails[spam eq null]',
+    expectedTokens: [
+      { type: 'Identifier', value: 'emails' },
+      { type: 'OpenSquareParenthesis', value: '[' },
+      { type: 'Identifier', value: 'spam' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Null', value: null },
+      { type: 'CloseSquareParenthesis', value: ']' },
+      { type: 'EOT' }
+    ]
   }
 ];
 
