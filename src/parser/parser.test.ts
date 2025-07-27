@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import { Parser } from './parser';
-import { Token } from '../lexer/types';
 import { Lexer } from '../lexer/lexer';
 import { Expression } from './types';
 
@@ -81,5 +80,28 @@ describe('Parser', () => {
         value: '30'
       }
     });
+  });
+
+  it('should parse expression with pr operator', () => {
+    check('title pr', {
+      identifier: 'title',
+      operator: 'pr',
+    });
+  });
+
+  it('should parse expression with not operator', () => {
+    check('not (userName eq "john")', {
+      operator: 'not',
+      right: {
+        identifier: 'userName',
+        operator: 'eq',
+        value: 'john'
+      }
+    });
+  });
+
+  it('should throw error when not is not before grouping', () => {
+    const tokens = new Lexer('not userName eq "john"').parse();
+    expect(() => new Parser(tokens).parse()).toThrow('Expected group after "not" operator');
   });
 });

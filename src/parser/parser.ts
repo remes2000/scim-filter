@@ -29,11 +29,11 @@ export class Parser {
   }
 
   andLogicalExpression(): Expression {
-    let expression: Expression = this.attributeExpression();
+    let expression: Expression = this.notLogicalExpression();
 
     const andPredicate = (t: Token): t is IdentifierToken => isLogicalOperator(t) && t.value === 'and';
     if (this.match(andPredicate)) {
-      const right = this.attributeExpression();
+      const right = this.notLogicalExpression();
       expression = {
         left: expression,
         operator: 'and',
@@ -44,17 +44,44 @@ export class Parser {
     return expression;
   }
 
+  notLogicalExpression(): Expression {
+    const notPredicate = (t: Token): t is LogicalOperatorToken => isLogicalOperator(t) && t.value === 'not';
+    if (this.match(notPredicate)) {
+      const group = this.grouping();
+      if (!group) {
+        throw new Error('Expected group after "not" operator');
+      }
+      return {
+        operator: 'not',
+        right: group
+      };
+    }
+
+    return this.attributeExpression();
+  }
+
   attributeExpression(): Expression {
+    const grouping = this.grouping();
+    if (grouping) {
+      return grouping;
+    }
+
+    const { value: identifier } = this.consume(isIdentifier, 'Expected identifier');
+    const { value: operator } = this.consume(isOperator, 'Expected operator');
+    if (operator === 'pr') {
+      return { identifier, operator: 'pr' };
+    }
+    const { value } = this.consume(isValueToken, 'Expected value');
+    return { identifier, operator, value };
+  }
+
+  grouping(): Expression | null {
     if (this.match(isOpenParenthesis)) {
       const expression = this.parse();
       this.consume(isCloseParenthesis, 'Expected closing parenthesis');
       return expression;
     }
-
-    const { value: identifier } = this.consume(isIdentifier, 'Expected identifier');
-    const { value: operator } = this.consume(isOperator, 'Expected operator');
-    const { value } = this.consume(isValueToken, 'Expected value');
-    return { identifier, operator, value };
+    return null;
   }
 
   private match(predicate: PredicateFn) {
