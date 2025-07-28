@@ -1,4 +1,4 @@
-import { IdentifierToken, isCloseParenthesis, isEOT, isIdentifier, isLogicalOperator, isOpenParenthesis, isOperator, isValueToken, LogicalOperator, LogicalOperatorToken, Token, TokenType } from "../lexer/types";
+import { IdentifierToken, isCloseParenthesis, isCloseSquareParenthesis, isEOT, isIdentifier, isLogicalOperator, isOpenParenthesis, isOpenSquareParenthesis, isOperator, isValueToken, LogicalOperator, LogicalOperatorToken, Token, TokenType } from "../lexer/types";
 import { Expression } from "./types";
 
 type PredicateFn<T extends Token = Token> = (token: Token) => token is T;
@@ -67,6 +67,11 @@ export class Parser {
     }
 
     const { value: identifier } = this.consume(isIdentifier, 'Expected identifier');
+    const valuePath = this.valuePath();
+    if (valuePath) {
+      return { identifier, expression: valuePath };
+    }
+
     const { value: operator } = this.consume(isOperator, 'Expected operator');
     if (operator === 'pr') {
       return { identifier, operator: 'pr' };
@@ -82,6 +87,15 @@ export class Parser {
       return expression;
     }
     return null;
+  }
+
+  valuePath(): Expression | null {
+   if (this.match(isOpenSquareParenthesis)) {
+    const expression = this.parse();
+    this.consume(isCloseSquareParenthesis, 'Expected closing square parenthesis');
+    return expression;
+   }
+   return null;
   }
 
   private match(predicate: PredicateFn) {

@@ -3,6 +3,7 @@ import { IdentifierToken, LogicalOperator, OperatorToken, ValueToken } from "../
 export type Expression = 
   | AttributeExpression
   | LogicalExpression
+  | ValuePathExpression
   | NotExpression;
 
 export type AttributeExpression =
@@ -18,6 +19,11 @@ interface ComparisionAttributeExpression {
 interface UnaryAttributeExpression {
   identifier: IdentifierToken['value'];
   operator: 'pr';
+}
+
+interface ValuePathExpression {
+  identifier: IdentifierToken['value'];
+  expression: Expression;
 }
 
 export interface LogicalExpression {

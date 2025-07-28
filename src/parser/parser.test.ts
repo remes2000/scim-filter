@@ -104,4 +104,23 @@ describe('Parser', () => {
     const tokens = new Lexer('not userName eq "john"').parse();
     expect(() => new Parser(tokens).parse()).toThrow('Expected group after "not" operator');
   });
+
+  it('should parse value path with logical operator', () => {
+   check('emails[type eq "work" and value co "@example.com"]', {
+      identifier: 'emails',
+      expression: {
+        left: {
+          identifier: 'type',
+          operator: 'eq',
+          value: 'work'
+        },
+        operator: 'and',
+        right: {
+          identifier: 'value',
+          operator: 'co',
+          value: '@example.com'
+        }
+      }
+   });
+  });
 });
