@@ -1,5 +1,5 @@
-import { IdentifierToken, isCloseParenthesis, isCloseSquareParenthesis, isEOT, isIdentifier, isLogicalOperator, isOpenParenthesis, isOpenSquareParenthesis, isOperator, isValueToken, LogicalOperator, LogicalOperatorToken, Token, TokenType } from "../lexer/types";
-import { Expression } from "./types";
+import { IdentifierToken, isCloseParenthesis, isCloseSquareParenthesis, isEOT, isIdentifier, isLogicalOperator, isOpenParenthesis, isOpenSquareParenthesis, isOperator, isValueToken, LogicalOperatorToken, Token } from "../lexer/types";
+import { Filter } from "./types";
 
 type PredicateFn<T extends Token = Token> = (token: Token) => token is T;
 
@@ -8,43 +8,41 @@ export class Parser {
 
   constructor(private readonly tokens: Token[]) {}
 
-  parse(): Expression {
+  parse(): Filter {
     return this.orLogicalExpression();
   }
 
-  orLogicalExpression(): Expression {
-    let expression: Expression = this.andLogicalExpression();
+  orLogicalExpression(): Filter {
+    let expression: Filter = this.andLogicalExpression();
 
     const orPredicate = (t: Token): t is IdentifierToken => isLogicalOperator(t) && t.value === 'or';
     if (this.match(orPredicate)) {
       const right = this.andLogicalExpression();
       expression = {
-        left: expression,
         operator: 'or',
-        right
+        filters: [expression, right]
       };
     }
 
     return expression;
   }
 
-  andLogicalExpression(): Expression {
-    let expression: Expression = this.notLogicalExpression();
+  andLogicalExpression(): Filter {
+    let expression: Filter = this.notLogicalExpression();
 
     const andPredicate = (t: Token): t is IdentifierToken => isLogicalOperator(t) && t.value === 'and';
     if (this.match(andPredicate)) {
       const right = this.notLogicalExpression();
       expression = {
-        left: expression,
         operator: 'and',
-        right
+        filters: [expression, right]
       };
     }
 
     return expression;
   }
 
-  notLogicalExpression(): Expression {
+  notLogicalExpression(): Filter {
     const notPredicate = (t: Token): t is LogicalOperatorToken => isLogicalOperator(t) && t.value === 'not';
     if (this.match(notPredicate)) {
       const group = this.grouping();
@@ -53,34 +51,34 @@ export class Parser {
       }
       return {
         operator: 'not',
-        right: group
+        filters: [group]
       };
     }
 
     return this.attributeExpression();
   }
 
-  attributeExpression(): Expression {
+  attributeExpression(): Filter {
     const grouping = this.grouping();
     if (grouping) {
       return grouping;
     }
 
-    const { value: identifier } = this.consume(isIdentifier, 'Expected identifier');
+    const { value: attribute } = this.consume(isIdentifier, 'Expected identifier');
     const valuePath = this.valuePath();
     if (valuePath) {
-      return { identifier, expression: valuePath };
+      return { attribute, operator: 'valuePath', filters: [valuePath] }
     }
 
     const { value: operator } = this.consume(isOperator, 'Expected operator');
     if (operator === 'pr') {
-      return { identifier, operator: 'pr' };
+      return { attribute, operator: 'pr' };
     }
     const { value } = this.consume(isValueToken, 'Expected value');
-    return { identifier, operator, value };
+    return { attribute, operator, value };
   }
 
-  grouping(): Expression | null {
+  grouping(): Filter | null {
     if (this.match(isOpenParenthesis)) {
       const expression = this.parse();
       this.consume(isCloseParenthesis, 'Expected closing parenthesis');
@@ -89,7 +87,7 @@ export class Parser {
     return null;
   }
 
-  valuePath(): Expression | null {
+  valuePath(): Filter | null {
    if (this.match(isOpenSquareParenthesis)) {
     const expression = this.parse();
     this.consume(isCloseSquareParenthesis, 'Expected closing square parenthesis');

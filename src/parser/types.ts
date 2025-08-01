@@ -1,38 +1,38 @@
-import { IdentifierToken, LogicalOperator, OperatorToken, ValueToken } from "../lexer/types";
+import { CompareLogicalOperator, IdentifierToken, Operator, ValueToken } from "../lexer/types";
 
-export type Expression = 
+export type Filter = 
   | AttributeExpression
   | LogicalExpression
   | ValuePathExpression
   | NotExpression;
 
-export type AttributeExpression =
+type AttributeExpression =
   | ComparisionAttributeExpression
   | UnaryAttributeExpression;
 
-interface ComparisionAttributeExpression {
-  identifier: IdentifierToken['value'];
-  operator: OperatorToken['value'];
-  value: ValueToken['value'];
-}
-
 interface UnaryAttributeExpression {
-  identifier: IdentifierToken['value'];
+  attribute: IdentifierToken['value'];
   operator: 'pr';
 }
 
-interface ValuePathExpression {
-  identifier: IdentifierToken['value'];
-  expression: Expression;
+interface ComparisionAttributeExpression {
+  attribute: IdentifierToken['value'];
+  operator: Exclude<Operator, 'pr'>;
+  value: ValueToken['value'];
 }
 
-export interface LogicalExpression {
-  left: Expression;
-  operator: LogicalOperator;
-  right: Expression;
-};
+interface ValuePathExpression {
+  attribute: IdentifierToken['value'];
+  operator: 'valuePath';
+  filters: [Filter]
+}
 
-export interface NotExpression {
-  operator: 'not',
-  right: Expression;
+interface LogicalExpression {
+  operator: CompareLogicalOperator;
+  filters: [Filter, Filter];
+}
+
+interface NotExpression {
+  operator: 'not';
+  filters: [Filter];
 }
