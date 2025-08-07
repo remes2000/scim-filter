@@ -1,12 +1,13 @@
-import { IdentifierToken, isCloseParenthesis, isCloseSquareParenthesis, isEOT, isIdentifier, isLogicalOperator, isOpenParenthesis, isOpenSquareParenthesis, isOperator, isValueToken, LogicalOperatorToken, Token } from "../lexer/types";
+import { IdentifierToken, isCloseParenthesis, isCloseSquareParenthesis, isIdentifier, isLogicalOperator, isOpenParenthesis, isOpenSquareParenthesis, isOperator, isValueToken, LogicalOperatorToken, Token } from "../lexer/types";
+import { Walker } from "../walker/walker";
 import { Filter } from "./types";
 
-type PredicateFn<T extends Token = Token> = (token: Token) => token is T;
-
 export class Parser {
-  private current: number = 0;
+  private walker: Walker<Token>;
 
-  constructor(private readonly tokens: Token[]) {}
+  constructor(private readonly tokens: Token[]) {
+    this.walker = new Walker(this.tokens);
+  }
 
   parse(): Filter {
     return this.orLogicalExpression();
@@ -16,7 +17,7 @@ export class Parser {
     let expression: Filter = this.andLogicalExpression();
 
     const orPredicate = (t: Token): t is IdentifierToken => isLogicalOperator(t) && t.value === 'or';
-    if (this.match(orPredicate)) {
+    if (this.walker.match(orPredicate)) {
       const right = this.andLogicalExpression();
       expression = {
         operator: 'or',
@@ -31,7 +32,7 @@ export class Parser {
     let expression: Filter = this.notLogicalExpression();
 
     const andPredicate = (t: Token): t is IdentifierToken => isLogicalOperator(t) && t.value === 'and';
-    if (this.match(andPredicate)) {
+    if (this.walker.match(andPredicate)) {
       const right = this.notLogicalExpression();
       expression = {
         operator: 'and',
@@ -44,7 +45,7 @@ export class Parser {
 
   notLogicalExpression(): Filter {
     const notPredicate = (t: Token): t is LogicalOperatorToken => isLogicalOperator(t) && t.value === 'not';
-    if (this.match(notPredicate)) {
+    if (this.walker.match(notPredicate)) {
       const group = this.grouping();
       if (!group) {
         throw new Error('Expected group after "not" operator');
@@ -64,81 +65,35 @@ export class Parser {
       return grouping;
     }
 
-    const { value: attribute } = this.consume(isIdentifier, 'Expected identifier');
+    const { value: attribute } = this.walker.consume(isIdentifier, 'Expected identifier');
     const valuePath = this.valuePath();
     if (valuePath) {
       return { attribute, operator: 'valuePath', filters: [valuePath] }
     }
 
-    const { value: operator } = this.consume(isOperator, 'Expected operator');
+    const { value: operator } = this.walker.consume(isOperator, 'Expected operator');
     if (operator === 'pr') {
       return { attribute, operator: 'pr' };
     }
-    const { value } = this.consume(isValueToken, 'Expected value');
+    const { value } = this.walker.consume(isValueToken, 'Expected value');
     return { attribute, operator, value };
   }
 
   grouping(): Filter | null {
-    if (this.match(isOpenParenthesis)) {
+    if (this.walker.match(isOpenParenthesis)) {
       const expression = this.parse();
-      this.consume(isCloseParenthesis, 'Expected closing parenthesis');
+      this.walker.consume(isCloseParenthesis, 'Expected closing parenthesis');
       return expression;
     }
     return null;
   }
 
   valuePath(): Filter | null {
-   if (this.match(isOpenSquareParenthesis)) {
+   if (this.walker.match(isOpenSquareParenthesis)) {
     const expression = this.parse();
-    this.consume(isCloseSquareParenthesis, 'Expected closing square parenthesis');
+    this.walker.consume(isCloseSquareParenthesis, 'Expected closing square parenthesis');
     return expression;
    }
    return null;
-  }
-
-  private match(predicate: PredicateFn) {
-    if (this.check(predicate)) {
-      this.advance();
-      return true;
-    }
-    return false;
-  }
-
-  private advance<T extends Token>(): T {
-    if (!this.isAtEnd()) {
-      this.current++;
-    }
-    return this.previous();
-  }
-
-  private consume<T extends Token>(predicate: PredicateFn<T>, message: string): T {
-    if (this.check(predicate)) {
-      return this.advance<T>();
-    }
-    throw new Error(message);
-  }
-
-  private check<T extends Token>(predicate: PredicateFn<T>): boolean {
-    if (this.isAtEnd()) {
-      return false;
-    }
-    return predicate(this.peak());
-  }
-
-  private previous<T extends Token>(): T {
-    if (this.current === 0) {
-      // TODO: handle error
-      throw new Error("No previous token available");
-    }
-    const token = this.tokens[this.current - 1];
-    return token as T;
-  }
-
-  private isAtEnd() {
-    return isEOT(this.peak());
-  }
-
-  private peak(): Token {
-    return this.tokens[this.current];
   }
 }
