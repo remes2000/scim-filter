@@ -5,6 +5,7 @@ import { Filter } from "./types";
 export class Parser {
   private walker: Walker<Token>;
 
+  // TODO: We should have string as an input, not a list of tokens
   constructor(private readonly tokens: Token[]) {
     this.walker = new Walker(this.tokens);
   }
@@ -14,30 +15,24 @@ export class Parser {
   }
 
   orLogicalExpression(): Filter {
-    let expression: Filter = this.andLogicalExpression();
+    const expression = this.andLogicalExpression();
 
     const orPredicate = (t: Token): t is IdentifierToken => isLogicalOperator(t) && t.value === 'or';
     if (this.walker.match(orPredicate)) {
       const right = this.andLogicalExpression();
-      expression = {
-        operator: 'or',
-        filters: [expression, right]
-      };
+      return { operator: 'or', filters: [ expression, right ] };
     }
 
     return expression;
   }
 
   andLogicalExpression(): Filter {
-    let expression: Filter = this.notLogicalExpression();
+    const expression = this.notLogicalExpression();
 
     const andPredicate = (t: Token): t is IdentifierToken => isLogicalOperator(t) && t.value === 'and';
     if (this.walker.match(andPredicate)) {
       const right = this.notLogicalExpression();
-      expression = {
-        operator: 'and',
-        filters: [expression, right]
-      };
+      return { operator: 'and', filters: [expression, right] };
     }
 
     return expression;
@@ -50,10 +45,7 @@ export class Parser {
       if (!group) {
         throw new Error('Expected group after "not" operator');
       }
-      return {
-        operator: 'not',
-        filters: [group]
-      };
+      return { operator: 'not', filters: [group] };
     }
 
     return this.attributeExpression();
