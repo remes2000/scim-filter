@@ -10,6 +10,9 @@ export class Walker<T> {
 
   consume<S extends T>(predicate: CheckPredicate<T, S>, errorMessage: string): S {
     const element = this.peak();
+    if (element === null) {
+      throw new Error(errorMessage);
+    }
     if (predicate(element)) {
       this.advance();
       return element;
@@ -26,20 +29,25 @@ export class Walker<T> {
   }
 
   advance(): T | null {
-    if (!this.isAtEnd()) {
-      this.position++;
-      return this.previous();
+    if (this.isAtEnd()) {
+      return null;
     }
-    return this.peak();
+    this.position++;
+    return this.previous();
   }
 
   // Non modyfying state methods
 
   check(predicate: CheckPredicate<T>): boolean {
-    return predicate(this.peak());
+    const currentElement = this.peak();
+    if (currentElement === null) {
+      return false;
+    }
+    return predicate(currentElement);
   }
 
-  peak(): T {
+  peak(): T | null {
+    if (this.isAtEnd()) return null;
     return this.symbols[this.position];
   }
 
@@ -55,6 +63,6 @@ export class Walker<T> {
   }
 
   isAtEnd(): boolean {
-    return this.position === this.symbols.length - 1;
+    return this.position >= this.symbols.length;
   }
 }

@@ -19,6 +19,12 @@ describe('Walker', () => {
       expect(walker.peak()).toBe('a');
       expect(walker.peak()).toBe('a'); // Should not advance
     });
+
+    it('should return null when at end', () => {
+      const walker = new Walker(['a']);
+      walker.advance();
+      expect(walker.peak()).toBeNull();
+    });
   });
 
   describe('advance', () => {
@@ -33,7 +39,8 @@ describe('Walker', () => {
       const walker = new Walker(['a']);
       const result = walker.advance();
       expect(result).toBe('a');
-      expect(walker.peak()).toBe('a');
+      expect(walker.peak()).toBeNull();
+      expect(walker.advance()).toBeNull();
     });
   });
 
@@ -62,6 +69,13 @@ describe('Walker', () => {
       const isB = (symbol: string): symbol is 'b' => symbol === 'b';
       expect(walker.check(isB)).toBe(false);
     });
+
+    it('should always return false at end', () => {
+      const walker = new Walker(['a']);
+      walker.advance();
+      const isA = (symbol: string): symbol is 'a' => symbol === 'a';
+      expect(walker.check(isA)).toBe(false);
+    });
   });
 
   describe('match', () => {
@@ -77,6 +91,14 @@ describe('Walker', () => {
       const isB = (symbol: string): symbol is 'b' => symbol === 'b';
       expect(walker.match(isB)).toBe(false);
       expect(walker.peak()).toBe('a');
+    });
+
+    it('should not advance and return false at end', () => {
+      const walker = new Walker(['a']);
+      walker.advance();
+      const isA = (symbol: string): symbol is 'a' => symbol === 'a';
+      expect(walker.match(isA)).toBe(false);
+      expect(walker.peak()).toBeNull();
     });
   });
 
@@ -94,6 +116,14 @@ describe('Walker', () => {
       const isB = (symbol: string): symbol is 'b' => symbol === 'b';
       expect(() => walker.consume(isB, 'Expected b')).toThrow('Expected b');
       expect(walker.peak()).toBe('a'); // Should not advance
+    });
+
+    it('should throw error when at end', () => {
+      const walker = new Walker(['a']);
+      walker.advance();
+      const isA = (symbol: string): symbol is 'a' => symbol === 'a';
+      expect(() => walker.consume(isA, 'Expected a')).toThrow('Expected a');
+      expect(walker.peak()).toBeNull();
     });
   });
 
@@ -113,18 +143,6 @@ describe('Walker', () => {
       expect(walker.check(isNumber)).toBe(true);
       const numberToken = walker.consume(isNumber, 'Expected number');
       expect(numberToken.value).toBe('42');
-    });
-  });
-
-  describe('edge cases', () => {
-    it('should handle multiple advances at end', () => {
-      const walker = new Walker(['a', 'b']);
-      walker.advance();
-      walker.advance();
-      walker.advance();
-      
-      expect(walker.peak()).toBe('b');
-      expect(walker.previous()).toBe('a');
     });
   });
 });
