@@ -36,7 +36,7 @@ export class Lexer {
     this.walker = new Walker(input.split(''));
   }
 
-  parse() {
+  parse(): Token[] {
     while (!this.walker.isAtEnd()) {
       this.parseToken();
     }

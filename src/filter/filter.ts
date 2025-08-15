@@ -1,7 +1,7 @@
 // I'm not sure if that file belongs here. Now, I only want to validate
 // If the whole setup is ready to be used
 
-import { Lexer } from "../lexer/lexer-old";
+import { Lexer } from "../lexer/lexer";
 import { Parser } from "../parser/parser";
 
 type Predicate<T> = (value: T, index: number, array: T[]) => boolean;

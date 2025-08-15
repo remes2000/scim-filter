@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { Parser } from './parser';
-import { Lexer } from '../lexer/lexer-old';
+import { Lexer } from '../lexer/lexer';
 import { Filter } from './types';
 
 const check = (expression: string, expected: Filter) => {
@@ -23,7 +23,7 @@ describe('Parser', () => {
       operator: 'and',
       filters: [
         { attribute: 'userName', operator: 'eq', value: 'john' },
-        { attribute: 'age', operator: 'lt', value: '25' }
+        { attribute: 'age', operator: 'lt', value: 25 }
       ]
     });
   });
@@ -37,7 +37,7 @@ describe('Parser', () => {
           operator: 'and',
           filters: [
             { attribute: 'userName', operator: 'eq', value: 'mike' },
-            { attribute: 'age', operator: 'lt', value: '30' },
+            { attribute: 'age', operator: 'lt', value: 30 },
           ]
         }
       ]
@@ -55,7 +55,7 @@ describe('Parser', () => {
             { attribute: 'userName', operator: 'eq', value: 'mike' }
           ]
         },
-        { attribute: 'age', operator: 'lt', value: '30' }
+        { attribute: 'age', operator: 'lt', value: 30 }
       ]
     });
   });
