@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { Parser } from './parser';
-import { Lexer } from '../lexer/lexer';
+import { Lexer } from '../lexer/lexer-old';
 import { Filter } from './types';
 
 const check = (expression: string, expected: Filter) => {

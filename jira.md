@@ -6,5 +6,6 @@
 [ ] Cleanup parser code
 [ ] Add better error handling in parser
 [x] Create a generic class to move through tokens/symbols?
+[ ] Make operators extensible 
 
 # DONE

@@ -1,3 +1,4 @@
+import { Walker } from "../walker/walker";
 import { LOGICAL_OPERATORS, OPERATORS } from "./constants";
 import { LogicalOperator, Operator, Token } from "./types";
 
@@ -13,174 +14,92 @@ const isDigit = (char: string | null): char is string => {
   }
   return /^[0-9]$/.test(char);
 };
+const isAlphaNumeric = (char: string | null): char is string => {
+  return isAlpha(char) || isDigit(char);
+};
+const isWhitespace = (char: string | null): char is string => {
+  if (char === null) {
+    return false;
+  }
+  return /\s/.test(char);
+};
 
 const isOperator = (value: string): value is Operator => OPERATORS.includes(value);
 const isLogicalOperator = (value: string): value is LogicalOperator => LOGICAL_OPERATORS.includes(value);
 
 export class Lexer {
-  private state: State = new DefaultState([]);
+  private readonly walker: Walker<string>;
+  private readonly tokens: Token[] = [];
 
-  constructor(private readonly input: string) { }
-
-  parse(): Token[] {
-    [...this.input.split(''), null].forEach((char) => {
-      this.state = this.state.handle(char);
-    });
-    return [...this.state.tokens, { type: 'EOT' }];
+  constructor(input: string) {
+    this.walker = new Walker(input.split(''));
   }
-}
 
-interface State {
-  handle: (char: string | null) => State;
-  readonly tokens: Token[];
-}
+  parse() {
+    while (!this.walker.isAtEnd()) {
+      this.parseToken();
+    }
+    return [...this.tokens, { type: 'EOT' }];
+  }
 
-class DefaultState implements State {
-  private memory = '';
-
-  constructor(readonly tokens: Token[]) {}
-
-  handle(char: string | null) {
+  parseToken() {
+    const char = this.walker.advance();
     if (char === '(') {
       this.tokens.push({ type: 'OpenParenthesis', value: '(' });
-      return new DefaultState(this.tokens);
-    }
-    if (char === ')') {
+    } else if (char === ')') {
       this.tokens.push({ type: 'CloseParenthesis', value: ')' });
-      return new DefaultState(this.tokens);
-    }
-    if (char === '[') {
+    } else if (char === '[') {
       this.tokens.push({ type: 'OpenSquareParenthesis', value: '[' });
-      return new DefaultState(this.tokens);
-    }
-    if (char === ']') {
+    } else if (char === ']') {
       this.tokens.push({ type: 'CloseSquareParenthesis', value: ']' });
-      return new DefaultState(this.tokens); 
-    }
-    if (char === ' ') {
-      return new DefaultState(this.tokens);
-    }
-    if (char === '"') {
-      return new StringState(this.tokens);
-    }
-    if (char === '.') {
+    } else if (char === '.') {
       this.tokens.push({ type: 'Dot', value: '.' });
-      return new DefaultState(this.tokens);
+    } else if (char === '"') {
+      this.parseString();
+    } else if (isDigit(char)) {
+      this.parseNumber();
+    } else if (isAlpha(char)){
+      this.parseIdentifier(char);
+    } else if (isWhitespace(char)) {
+      return;
+    } else {
+      throw new Error(`Invalid character '${char}' at position ${this.walker.getCurrentPosition()}`);
     }
-    if (isDigit(char)) {
-      return new NumberState(char, this.tokens);
-    }
-    if (isAlpha(char)) {
-      return new IdentifierState(char, this.tokens);
-    }
-    if (char === null) {
-      return this;
-    }
-
-    // TODO: add error type, add position
-    throw 'Invalid character: ' + char;
-  }
-}
-
-class IdentifierState implements State {
-  private memory: string;
-
-  constructor(
-    consumedCharacters: string,
-    readonly tokens: Token[]
-  ) {
-    this.memory = consumedCharacters;
   }
 
-  handle(char: string | null): State {
-    if (isAlpha(char) || isDigit(char) || char === '_' || char === '-') { 
-      this.memory += char
-      return this;
-    }
-    if (isOperator(this.memory)) {
-      this.tokens.push({ type: 'Operator', value: this.memory });
-      return new DefaultState(this.tokens);
-    }
-    if (isLogicalOperator(this.memory)) {
-      this.tokens.push({ type: 'LogicalOperator', value: this.memory });
-      if (this.memory === 'not' && char === '(') {
-        this.tokens.push({ type: 'OpenParenthesis', value: '(' });
+  parseString() {
+    let value = '';
+    const startPosition = this.walker.getCurrentPosition() - 1;
+    while (this.walker.peak() !== '"') {
+      if (this.walker.isAtEnd()) {
+        throw new Error('Unterminated string literal, starting at position ' + startPosition); 
       }
-      return new DefaultState(this.tokens);
+      value += this.walker.advance();
     }
-    if (this.memory === 'true' || this.memory === 'false') {
-      this.tokens.push({ type: 'Boolean', value: this.memory === 'true' });
-      if (char === ')') {
-        this.tokens.push({ type: 'CloseParenthesis', value: ')' });
-      }
-      if (char === ']') {
-        this.tokens.push({ type: 'CloseSquareParenthesis', value: ']' });
-      }
-      return new DefaultState(this.tokens);
-    }
-    if (this.memory === 'null') {
-      this.tokens.push({ type: 'Null', value: null });
-      if (char === ')') {
-        this.tokens.push({ type: 'CloseParenthesis', value: ')' });
-      }
-      if (char === ']') {
-        this.tokens.push({ type: 'CloseSquareParenthesis', value: ']' });
-      }
-      return new DefaultState(this.tokens);
-    }
-    this.tokens.push({ type: 'Identifier', value: this.memory });
-    if (char === '.') {
-      this.tokens.push({ type: 'Dot', value: '.' });
-    }
-    if (char === '[') {
-      this.tokens.push({ type: 'OpenSquareParenthesis', value: '[' });
-    }
-    return new DefaultState(this.tokens);
-  }
-}
-
-class StringState implements State {
-  private memory = '';
-
-  constructor(readonly tokens: Token[]) {}
-
-  handle(char: string | null): State {
-    if (char === '"' && this.memory.slice(-1) !== '\\') {
-      this.tokens.push({ type: 'String', value: this.memory });
-      return new DefaultState(this.tokens);
-    }
-    if (char === null) {
-      // TODO: add error type, add position
-      throw 'Unterminated string literal';
-    }
-    this.memory += char;
-    return this;
-  }
-}
-
-class NumberState implements State {
-  private memory = '';
-
-  constructor(
-    consumedCharacters: string,
-    readonly tokens: Token[]
-  ) {
-    this.memory = consumedCharacters;
+    this.walker.advance(); // consume the closing quote
+    this.tokens.push({ type: 'String', value });
   }
 
-  handle(char: string | null): State {
-    // TODO: handle decimal numbers, more complex numbers with scientific notation
-    if (isDigit(char)) {
-      this.memory += char;
-      return this;
+  parseNumber() {
+    // TODO: parse number
+  }
+
+  parseIdentifier(startChar: string) {
+    let identifier = startChar;
+    while (this.walker.check(isAlphaNumeric)) {
+      identifier += this.walker.advance();
+
+      if (this.walker.isAtEnd()) {
+        break;
+      }
     }
-    this.tokens.push({ type: 'Number', value: this.memory });
-    if (char === ')') {
-      this.tokens.push({ type: 'CloseParenthesis', value: ')' });
+    // TODO: add support for booleans and null 
+    if (isOperator(identifier)) {
+      this.tokens.push({ type: 'Operator', value: identifier });
+    } else if (isLogicalOperator(identifier)) {
+      this.tokens.push({ type: 'LogicalOperator', value: identifier });
+    } else {
+      this.tokens.push({ type: 'Identifier', value: identifier });
     }
-    if (char === ']') {
-      this.tokens.push({ type: 'CloseSquareParenthesis', value: ']' });
-    }
-    return new DefaultState(this.tokens);
   }
 }

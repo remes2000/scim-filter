@@ -50,11 +50,11 @@ export class Walker<T> {
     return this.symbols[this.position - 1];
   }
 
-  private isAtStart(): boolean {
+  isAtStart(): boolean {
     return this.position === 0;
   }
 
-  private isAtEnd(): boolean {
+  isAtEnd(): boolean {
     return this.position === this.symbols.length - 1;
   }
 }
