@@ -47,7 +47,7 @@ export interface BooleanValueToken {
 
 export interface NumberValueToken {
   type: 'Number';
-  value: string;
+  value: number;
 }
 
 export interface NullValueToken {

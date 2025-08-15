@@ -7,10 +7,6 @@ describe('Walker', () => {
       const walker = new Walker(['a', 'b', 'c']);
       expect(walker.peak()).toBe('a');
     });
-
-    it('should throw error when given empty array', () => {
-      expect(() => new Walker([])).toThrow('Walker requires at least one symbol');
-    });
   });
 
   describe('peak', () => {

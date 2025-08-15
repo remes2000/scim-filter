@@ -3,9 +3,6 @@ type CheckPredicate<T, S extends T = T> = (symbol: T) => symbol is S;
 export class Walker<T> {
   private position = 0;
   constructor(private readonly symbols: T[]) {
-    if (symbols.length === 0) {
-      throw new Error('Walker requires at least one symbol');
-    }
   }
 
   consume<S extends T>(predicate: CheckPredicate<T, S>, errorMessage: string): S {
@@ -64,5 +61,9 @@ export class Walker<T> {
 
   isAtEnd(): boolean {
     return this.position >= this.symbols.length;
+  }
+
+  getCurrentPosition(): number {
+    return this.position;
   }
 }

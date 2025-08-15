@@ -7,6 +7,11 @@ const check = (input: string, tokens: Token[]) => {
   expect(lexer.parse()).toEqual(tokens);
 };
 
+const checkError = (input: string, expectedError: string) => {
+  const lexer = new Lexer(input);
+  expect(() => lexer.parse()).toThrow(expectedError);
+};
+
 const testCases: { input: string; expectedTokens: Token[] }[] = [
   {
     input: 'userName eq "bjensen"',
@@ -153,92 +158,92 @@ const testCases: { input: string; expectedTokens: Token[] }[] = [
       { type: 'EOT' }
     ]
   },
-  // {
-  //   input: 'userType ne "Employee" and not (emails co "example.com" or emails.value co "example.org")',
-  //   expectedTokens: [
-  //     { type: 'Identifier', value: 'userType' },
-  //     { type: 'Operator', value: 'ne' },
-  //     { type: 'String', value: 'Employee' },
-  //     { type: 'LogicalOperator', value: 'and' },
-  //     { type: 'LogicalOperator', value: 'not' },
-  //     { type: 'OpenParenthesis', value: '(' },
-  //     { type: 'Identifier', value: 'emails' },
-  //     { type: 'Operator', value: 'co' },
-  //     { type: 'String', value: 'example.com' },
-  //     { type: 'LogicalOperator', value: 'or' },
-  //     { type: 'Identifier', value: 'emails' },
-  //     { type: 'Dot', value: '.' },
-  //     { type: 'Identifier', value: 'value' },
-  //     { type: 'Operator', value: 'co' },
-  //     { type: 'String', value: 'example.org' },
-  //     { type: 'CloseParenthesis', value: ')' },
-  //     { type: 'EOT' }
-  //   ]
-  // },
-  // {
-  //   input: 'userType eq "Employee" and (emails.type eq "work")',
-  //   expectedTokens: [
-  //     { type: 'Identifier', value: 'userType' },
-  //     { type: 'Operator', value: 'eq' },
-  //     { type: 'String', value: 'Employee' },
-  //     { type: 'LogicalOperator', value: 'and' },
-  //     { type: 'OpenParenthesis', value: '(' },
-  //     { type: 'Identifier', value: 'emails' },
-  //     { type: 'Dot', value: '.' },
-  //     { type: 'Identifier', value: 'type' },
-  //     { type: 'Operator', value: 'eq' },
-  //     { type: 'String', value: 'work' },
-  //     { type: 'CloseParenthesis', value: ')' },
-  //     { type: 'EOT' }
-  //   ]
-  // },
-  // {
-  //   input: 'userType eq "Employee" and emails[type eq "work" and value co "@example.com"]',
-  //   expectedTokens: [
-  //     { type: 'Identifier', value: 'userType' },
-  //     { type: 'Operator', value: 'eq' },
-  //     { type: 'String', value: 'Employee' },
-  //     { type: 'LogicalOperator', value: 'and' },
-  //     { type: 'Identifier', value: 'emails' },
-  //     { type: 'OpenSquareParenthesis', value: '[' },
-  //     { type: 'Identifier', value: 'type' },
-  //     { type: 'Operator', value: 'eq' },
-  //     { type: 'String', value: 'work' },
-  //     { type: 'LogicalOperator', value: 'and' },
-  //     { type: 'Identifier', value: 'value' },
-  //     { type: 'Operator', value: 'co' },
-  //     { type: 'String', value: '@example.com' },
-  //     { type: 'CloseSquareParenthesis', value: ']' },
-  //     { type: 'EOT' }
-  //   ]
-  // },
-  // {
-  //   input: 'emails[type eq "work" and value co "@example.com"] or ims[type eq "xmpp" and value co "@foo.com"]',
-  //   expectedTokens: [
-  //     { type: 'Identifier', value: 'emails' },
-  //     { type: 'OpenSquareParenthesis', value: '[' },
-  //     { type: 'Identifier', value: 'type' },
-  //     { type: 'Operator', value: 'eq' },
-  //     { type: 'String', value: 'work' },
-  //     { type: 'LogicalOperator', value: 'and' },
-  //     { type: 'Identifier', value: 'value' },
-  //     { type: 'Operator', value: 'co' },
-  //     { type: 'String', value: '@example.com' },
-  //     { type: 'CloseSquareParenthesis', value: ']' },
-  //     { type: 'LogicalOperator', value: 'or' },
-  //     { type: 'Identifier', value: 'ims' },
-  //     { type: 'OpenSquareParenthesis', value: '[' },
-  //     { type: 'Identifier', value: 'type' },
-  //     { type: 'Operator', value: 'eq' },
-  //     { type: 'String', value: 'xmpp' },
-  //     { type: 'LogicalOperator', value: 'and' },
-  //     { type: 'Identifier', value: 'value' },
-  //     { type: 'Operator', value: 'co' },
-  //     { type: 'String', value: '@foo.com' },
-  //     { type: 'CloseSquareParenthesis', value: ']' },
-  //     { type: 'EOT' }
-  //   ]
-  // },
+  {
+    input: 'userType ne "Employee" and not (emails co "example.com" or emails.value co "example.org")',
+    expectedTokens: [
+      { type: 'Identifier', value: 'userType' },
+      { type: 'Operator', value: 'ne' },
+      { type: 'String', value: 'Employee' },
+      { type: 'LogicalOperator', value: 'and' },
+      { type: 'LogicalOperator', value: 'not' },
+      { type: 'OpenParenthesis', value: '(' },
+      { type: 'Identifier', value: 'emails' },
+      { type: 'Operator', value: 'co' },
+      { type: 'String', value: 'example.com' },
+      { type: 'LogicalOperator', value: 'or' },
+      { type: 'Identifier', value: 'emails' },
+      { type: 'Dot', value: '.' },
+      { type: 'Identifier', value: 'value' },
+      { type: 'Operator', value: 'co' },
+      { type: 'String', value: 'example.org' },
+      { type: 'CloseParenthesis', value: ')' },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'userType eq "Employee" and (emails.type eq "work")',
+    expectedTokens: [
+      { type: 'Identifier', value: 'userType' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'String', value: 'Employee' },
+      { type: 'LogicalOperator', value: 'and' },
+      { type: 'OpenParenthesis', value: '(' },
+      { type: 'Identifier', value: 'emails' },
+      { type: 'Dot', value: '.' },
+      { type: 'Identifier', value: 'type' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'String', value: 'work' },
+      { type: 'CloseParenthesis', value: ')' },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'userType eq "Employee" and emails[type eq "work" and value co "@example.com"]',
+    expectedTokens: [
+      { type: 'Identifier', value: 'userType' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'String', value: 'Employee' },
+      { type: 'LogicalOperator', value: 'and' },
+      { type: 'Identifier', value: 'emails' },
+      { type: 'OpenSquareParenthesis', value: '[' },
+      { type: 'Identifier', value: 'type' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'String', value: 'work' },
+      { type: 'LogicalOperator', value: 'and' },
+      { type: 'Identifier', value: 'value' },
+      { type: 'Operator', value: 'co' },
+      { type: 'String', value: '@example.com' },
+      { type: 'CloseSquareParenthesis', value: ']' },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'emails[type eq "work" and value co "@example.com"] or ims[type eq "xmpp" and value co "@foo.com"]',
+    expectedTokens: [
+      { type: 'Identifier', value: 'emails' },
+      { type: 'OpenSquareParenthesis', value: '[' },
+      { type: 'Identifier', value: 'type' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'String', value: 'work' },
+      { type: 'LogicalOperator', value: 'and' },
+      { type: 'Identifier', value: 'value' },
+      { type: 'Operator', value: 'co' },
+      { type: 'String', value: '@example.com' },
+      { type: 'CloseSquareParenthesis', value: ']' },
+      { type: 'LogicalOperator', value: 'or' },
+      { type: 'Identifier', value: 'ims' },
+      { type: 'OpenSquareParenthesis', value: '[' },
+      { type: 'Identifier', value: 'type' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'String', value: 'xmpp' },
+      { type: 'LogicalOperator', value: 'and' },
+      { type: 'Identifier', value: 'value' },
+      { type: 'Operator', value: 'co' },
+      { type: 'String', value: '@foo.com' },
+      { type: 'CloseSquareParenthesis', value: ']' },
+      { type: 'EOT' }
+    ]
+  },
   // // Additional test cases
   // {
   //   input: 'userName eq "bij\"ensen"',
@@ -249,135 +254,284 @@ const testCases: { input: string; expectedTokens: Token[] }[] = [
   //     { type: 'EOT' }
   //   ]
   // },
-  // {
-  //   input: 'active eq true',
-  //   expectedTokens: [
-  //     { type: 'Identifier', value: 'active' },
-  //     { type: 'Operator', value: 'eq' },
-  //     { type: 'Boolean', value: true },
-  //     { type: 'EOT' }
-  //   ]
-  // },
-  // {
-  //   input: 'active eq false',
-  //   expectedTokens: [
-  //     { type: 'Identifier', value: 'active' },
-  //     { type: 'Operator', value: 'eq' },
-  //     { type: 'Boolean', value: false },
-  //     { type: 'EOT' }
-  //   ]
-  // },
-  // {
-  //   input: 'active eq null',
-  //   expectedTokens: [
-  //     { type: 'Identifier', value: 'active' },
-  //     { type: 'Operator', value: 'eq' },
-  //     { type: 'Null', value: null },
-  //     { type: 'EOT' }
-  //   ]
-  // },
-  // {
-  //   input: 'age lt 40',
-  //   expectedTokens: [
-  //     { type: 'Identifier', value: 'age' },
-  //     { type: 'Operator', value: 'lt' },
-  //     { type: 'Number', value: '40' },
-  //     { type: 'EOT' }
-  //   ]
-  // },
-  // {
-  //   input: 'not(userType eq "Employee")',
-  //   expectedTokens: [
-  //     { type: 'LogicalOperator', value: 'not' },
-  //     { type: 'OpenParenthesis', value: '(' },
-  //     { type: 'Identifier', value: 'userType' },
-  //     { type: 'Operator', value: 'eq' },
-  //     { type: 'String', value: 'Employee' },
-  //     { type: 'CloseParenthesis', value: ')' },
-  //     { type: 'EOT' }
-  //   ]
-  // },
-  // {
-  //   input: 'not (userType eq "Employee")',
-  //   expectedTokens: [
-  //     { type: 'LogicalOperator', value: 'not' },
-  //     { type: 'OpenParenthesis', value: '(' },
-  //     { type: 'Identifier', value: 'userType' },
-  //     { type: 'Operator', value: 'eq' },
-  //     { type: 'String', value: 'Employee' },
-  //     { type: 'CloseParenthesis', value: ')' },
-  //     { type: 'EOT' }
-  //   ]
-  // },
-  // {
-  //   input: '(age lt 25)',
-  //   expectedTokens: [
-  //     { type: 'OpenParenthesis', value: '(' },
-  //     { type: 'Identifier', value: 'age' },
-  //     { type: 'Operator', value: 'lt' },
-  //     { type: 'Number', value: '25' },
-  //     { type: 'CloseParenthesis', value: ')' },
-  //     { type: 'EOT' } 
-  //   ]
-  // },
-  // {
-  //   input: '(isAdult eq true)',
-  //   expectedTokens: [
-  //     { type: 'OpenParenthesis', value: '(' },
-  //     { type: 'Identifier', value: 'isAdult' },
-  //     { type: 'Operator', value: 'eq' },
-  //     { type: 'Boolean', value: true },
-  //     { type: 'CloseParenthesis', value: ')' },
-  //     { type: 'EOT' }
-  //   ]
-  // },
-  // {
-  //   input: '(parent eq null)',
-  //   expectedTokens: [
-  //     { type: 'OpenParenthesis', value: '(' },
-  //     { type: 'Identifier', value: 'parent' },
-  //     { type: 'Operator', value: 'eq' },
-  //     { type: 'Null', value: null },
-  //     { type: 'CloseParenthesis', value: ')' },
-  //     { type: 'EOT' }
-  //   ]
-  // },
-  // {
-  //   input: 'emails[numOfRecipients gt 0]',
-  //   expectedTokens: [
-  //     { type: 'Identifier', value: 'emails' },
-  //     { type: 'OpenSquareParenthesis', value: '[' },
-  //     { type: 'Identifier', value: 'numOfRecipients' },
-  //     { type: 'Operator', value: 'gt' },
-  //     { type: 'Number', value: '0' },
-  //     { type: 'CloseSquareParenthesis', value: ']' },
-  //     { type: 'EOT' }
-  //   ]
-  // },
-  // {
-  //   input: 'emails[spam eq false]',
-  //   expectedTokens: [
-  //     { type: 'Identifier', value: 'emails' },
-  //     { type: 'OpenSquareParenthesis', value: '[' },
-  //     { type: 'Identifier', value: 'spam' },
-  //     { type: 'Operator', value: 'eq' },
-  //     { type: 'Boolean', value: false },
-  //     { type: 'CloseSquareParenthesis', value: ']' },
-  //     { type: 'EOT' }
-  //   ]
-  // },
-  // {
-  //   input: 'emails[spam eq null]',
-  //   expectedTokens: [
-  //     { type: 'Identifier', value: 'emails' },
-  //     { type: 'OpenSquareParenthesis', value: '[' },
-  //     { type: 'Identifier', value: 'spam' },
-  //     { type: 'Operator', value: 'eq' },
-  //     { type: 'Null', value: null },
-  //     { type: 'CloseSquareParenthesis', value: ']' },
-  //     { type: 'EOT' }
-  //   ]
-  // }
+  {
+    input: 'active eq true',
+    expectedTokens: [
+      { type: 'Identifier', value: 'active' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Boolean', value: true },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'active eq false',
+    expectedTokens: [
+      { type: 'Identifier', value: 'active' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Boolean', value: false },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'active eq null',
+    expectedTokens: [
+      { type: 'Identifier', value: 'active' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Null', value: null },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'age lt 40',
+    expectedTokens: [
+      { type: 'Identifier', value: 'age' },
+      { type: 'Operator', value: 'lt' },
+      { type: 'Number', value: 40 },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'not(userType eq "Employee")',
+    expectedTokens: [
+      { type: 'LogicalOperator', value: 'not' },
+      { type: 'OpenParenthesis', value: '(' },
+      { type: 'Identifier', value: 'userType' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'String', value: 'Employee' },
+      { type: 'CloseParenthesis', value: ')' },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'not (userType eq "Employee")',
+    expectedTokens: [
+      { type: 'LogicalOperator', value: 'not' },
+      { type: 'OpenParenthesis', value: '(' },
+      { type: 'Identifier', value: 'userType' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'String', value: 'Employee' },
+      { type: 'CloseParenthesis', value: ')' },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: '(age lt 25)',
+    expectedTokens: [
+      { type: 'OpenParenthesis', value: '(' },
+      { type: 'Identifier', value: 'age' },
+      { type: 'Operator', value: 'lt' },
+      { type: 'Number', value: 25 },
+      { type: 'CloseParenthesis', value: ')' },
+      { type: 'EOT' } 
+    ]
+  },
+  {
+    input: '(isAdult eq true)',
+    expectedTokens: [
+      { type: 'OpenParenthesis', value: '(' },
+      { type: 'Identifier', value: 'isAdult' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Boolean', value: true },
+      { type: 'CloseParenthesis', value: ')' },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: '(parent eq null)',
+    expectedTokens: [
+      { type: 'OpenParenthesis', value: '(' },
+      { type: 'Identifier', value: 'parent' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Null', value: null },
+      { type: 'CloseParenthesis', value: ')' },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'emails[numOfRecipients gt 0]',
+    expectedTokens: [
+      { type: 'Identifier', value: 'emails' },
+      { type: 'OpenSquareParenthesis', value: '[' },
+      { type: 'Identifier', value: 'numOfRecipients' },
+      { type: 'Operator', value: 'gt' },
+      { type: 'Number', value: 0 },
+      { type: 'CloseSquareParenthesis', value: ']' },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'emails[spam eq false]',
+    expectedTokens: [
+      { type: 'Identifier', value: 'emails' },
+      { type: 'OpenSquareParenthesis', value: '[' },
+      { type: 'Identifier', value: 'spam' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Boolean', value: false },
+      { type: 'CloseSquareParenthesis', value: ']' },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'emails[spam eq null]',
+    expectedTokens: [
+      { type: 'Identifier', value: 'emails' },
+      { type: 'OpenSquareParenthesis', value: '[' },
+      { type: 'Identifier', value: 'spam' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Null', value: null },
+      { type: 'CloseSquareParenthesis', value: ']' },
+      { type: 'EOT' }
+    ]
+  },
+  // JSON numbers
+  {
+    input: 'age eq -20',
+    expectedTokens: [
+      { type: 'Identifier', value: 'age' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Number', value: -20 },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'age eq 0.5',
+    expectedTokens: [
+      { type: 'Identifier', value: 'age' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Number', value: 0.5 },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'age eq 0.25',
+    expectedTokens: [
+      { type: 'Identifier', value: 'age' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Number', value: 0.25 },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'age eq 12e3',
+    expectedTokens: [
+      { type: 'Identifier', value: 'age' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Number', value: 12_000 },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'age eq 12E3',
+    expectedTokens: [
+      { type: 'Identifier', value: 'age' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Number', value: 12_000 },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'age eq 12e+3',
+    expectedTokens: [
+      { type: 'Identifier', value: 'age' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Number', value: 12_000 },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'age eq 1e-2',
+    expectedTokens: [
+      { type: 'Identifier', value: 'age' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Number', value: 0.01 },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'age eq 2.5e2',
+    expectedTokens: [
+      { type: 'Identifier', value: 'age' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Number', value: 250 },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'age eq 2.5e-1',
+    expectedTokens: [
+      { type: 'Identifier', value: 'age' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Number', value: 0.25 },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'age eq 2e10',
+    expectedTokens: [
+      { type: 'Identifier', value: 'age' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Number', value: 20_000_000_000 },
+      { type: 'EOT' }
+    ]
+  },
+  // Attributes with special signs
+  {
+    input: 'user_age eq 20',
+    expectedTokens: [
+      { type: 'Identifier', value: 'user_age' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Number', value: 20 },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: 'user-age eq 20',
+    expectedTokens: [
+      { type: 'Identifier', value: 'user-age' },
+      { type: 'Operator', value: 'eq' },
+      { type: 'Number', value: 20 },
+      { type: 'EOT' }
+    ]
+  },
+  {
+    input: '',
+    expectedTokens: [{ type: 'EOT' }]
+  },
+  {
+    input: ' ',
+    expectedTokens: [{ type: 'EOT' }]
+  }
+];
+
+const errorTestCases: { input: string; expectedError: string }[] = [
+  {
+    input: 'userName eq "unterminated',
+    expectedError: 'Unterminated string literal, starting at position 12'
+  },
+  {
+    input: 'user+name eq "Michael"',
+    expectedError: `Invalid character '+' at position 4`
+  },
+  {
+    input: 'age eq 1.',
+    expectedError: 'Invalid number format, expected digit at position 9'
+  },
+  {
+    input: 'age eq --2',
+    expectedError: 'Invalid number format, expected digit at position 8'
+  },
+  {
+    input: 'age eq 1e',
+    expectedError: 'Invalid number format, expected digit at position 9'
+  },
+  {
+    input: 'age eq 01',
+    expectedError: 'Invalid number format, leading zeros are not allowed at position 7'
+  },
+  {
+    input: 'age eq -01',
+    expectedError: 'Invalid number format, leading zeros are not allowed at position 8'
+  }
 ];
 
 describe('SCIM Filter Lexer', () => {
@@ -386,13 +540,17 @@ describe('SCIM Filter Lexer', () => {
       check(input, expectedTokens);
     });
   });
+
+  describe('Error cases', () => {
+    errorTestCases.forEach(({ input, expectedError }) => {
+      it(`should throw error for: ${input}`, () => {
+        checkError(input, expectedError);
+      });
+    });
+  });
 });
 
 /* 
 TODO: test cases
-- Empty input
-- Only whitespace
-- Only alphanumeric characters
-- JSON numbers
 - Escaped quote inside string
 */
