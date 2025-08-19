@@ -2,6 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { Lexer } from './lexer';
 import { Token } from './types';
 
+const BACKSPACE = '\b';
+const TAB = '\t';
+const LINE_FEED = '\n';
+const FORM_FEED = '\f';
+const CARRIAGE_RETURN = '\r';
+
 const check = (input: string, tokens: Token[]) => {
   const lexer = new Lexer(input);
   expect(lexer.parse()).toEqual(tokens);
@@ -500,7 +506,19 @@ const testCases: { input: string; expectedTokens: Token[] }[] = [
   {
     input: ' ',
     expectedTokens: [{ type: 'EOT' }]
-  }
+  },
+  // Escaped strings
+  { input: '"\\""', expectedTokens: [{ type: 'String', value: '"' }, { type: 'EOT' }]   },
+  { input: '"\\\\"', expectedTokens: [{ type: 'String', value: '\\' }, { type: 'EOT' }]   },
+  { input: '"/"', expectedTokens: [{ type: 'String', value: '/' }, { type: 'EOT' }]   },
+  { input: '"\\/"', expectedTokens: [{ type: 'String', value: '/' }, { type: 'EOT' }]   },
+  { input: '"\\' + BACKSPACE + '"', expectedTokens: [{ type: 'String', value: BACKSPACE }, { type: 'EOT' }]   },
+  { input: '"\\' + FORM_FEED + '"', expectedTokens: [{ type: 'String', value: FORM_FEED }, { type: 'EOT' }]   },
+  { input: '"\\' + LINE_FEED + '"', expectedTokens: [{ type: 'String', value: LINE_FEED }, { type: 'EOT' }]   },
+  { input: '"\\' + CARRIAGE_RETURN + '"', expectedTokens: [{ type: 'String', value: CARRIAGE_RETURN }, { type: 'EOT' }]   },
+  { input: '"\\' + TAB + '"', expectedTokens: [{ type: 'String', value: TAB }, { type: 'EOT' }]   },
+  { input: '"\\u00bf"', expectedTokens: [{ type: 'String', value: '¿' }, { type: 'EOT' }] },
+  { input: '"\\u00BF"', expectedTokens: [{ type: 'String', value: '¿' }, { type: 'EOT' }] },
 ];
 
 const errorTestCases: { input: string; expectedError: string }[] = [
@@ -531,7 +549,35 @@ const errorTestCases: { input: string; expectedError: string }[] = [
   {
     input: 'age eq -01',
     expectedError: 'Invalid number format, leading zeros are not allowed at position 8'
-  }
+  },
+  {
+    input: '"\\',
+    expectedError: 'Unterminated string literal, starting at position 0'
+  },
+  {
+    input: '"\\u1"',
+    expectedError: 'Invalid escape sequence, expected hexadecimal digit at position 4'
+  },
+  { 
+    input: '"' + BACKSPACE + '"',
+    expectedError: 'Invalid string character at position 1'
+  },
+  { 
+    input: '"' + FORM_FEED + '"',
+    expectedError: 'Invalid string character at position 1'
+  },
+  { 
+    input: '"' + LINE_FEED + '"',
+    expectedError: 'Invalid string character at position 1'
+  },
+  { 
+    input: '"' + CARRIAGE_RETURN + '"',
+    expectedError: 'Invalid string character at position 1'
+  },
+  { 
+    input: '"' + TAB + '"',
+    expectedError: 'Invalid string character at position 1'
+  },
 ];
 
 describe('SCIM Filter Lexer', () => {
@@ -549,8 +595,3 @@ describe('SCIM Filter Lexer', () => {
     });
   });
 });
-
-/* 
-TODO: test cases
-- Escaped quote inside string
-*/

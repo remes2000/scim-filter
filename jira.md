@@ -7,6 +7,7 @@
 [ ] Add better error handling in parser
 [x] Create a generic class to move through tokens/symbols?
 [ ] Make operators extensible 
-[ ] Handle escaped quotes in lexer
+[x] Handle escaped quotes in lexer
+[ ] Move parseString and parseNumber into separate file
 
 # DONE

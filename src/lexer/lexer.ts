@@ -68,13 +68,77 @@ export class Lexer {
     }
   }
 
+  // JSON string: https://datatracker.ietf.org/doc/html/rfc7159#section-7
   parseString() {
     let value = '';
     const startPosition = this.walker.getCurrentPosition() - 1;
+    const isBackslash = (char: string | null): char is '\\' => char === '\\';
+    const isStringCharacter = (char: string | null): char is string => {
+      if (char === null) {
+        return false;
+      }
+      const codePoint = char.codePointAt(0);
+      if (codePoint === undefined) {
+        return false;
+      }
+      // unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
+      return (codePoint >= 0x20 && codePoint <= 0x21) ||
+             (codePoint >= 0x23 && codePoint <= 0x5B) ||
+             (codePoint >= 0x5D && codePoint <= 0x10FFFF);
+    };
+
+    const parseEscaped = (): string => {
+      const isQuoute = (char: string | null): char is '"' => char === '"';
+      const isSlash = (char: string | null): char is '/' => char === '/';
+      const isBackspace = (char: string | null): char is '\b' => char === '\b';
+      const isFormFeed = (char: string | null): char is '\f' => char === '\f';
+      const isLineFeed = (char: string | null): char is '\n' => char === '\n';
+      const isCarriageReturn = (char: string | null): char is '\r' => char === '\r';
+      const isTab = (char: string | null): char is '\t' => char === '\t';
+      const isU = (char: string | null): char is 'u' => char === 'u';
+      const isHexCharacter = (char: string | null): char is string => {
+        if (char === null) {
+          return false;
+        }
+        return /^[0-9A-Fa-f]$/.test(char);
+      };
+
+      if (this.walker.match(isQuoute)) {
+        return '"';
+      } else if (this.walker.match(isBackslash)) {
+        return '\\';
+      } else if (this.walker.match(isSlash)) {
+        return '/';
+      } else if (this.walker.match(isBackspace)) {
+        return '\b';
+      } else if (this.walker.match(isFormFeed)) {
+        return '\f';
+      } else if (this.walker.match(isLineFeed)) {
+        return '\n';
+      } else if (this.walker.match(isCarriageReturn)) {
+        return '\r';
+      } else if (this.walker.match(isTab)) {
+        return '\t';
+      }
+      this.walker.consume(isU, 'Invalid escape sequence, expected escapable character at position ' + this.walker.getCurrentPosition() + 1);
+      let hex = '';
+      // Now let's read 4 hexadecimal digits
+      for (let i = 0; i < 4; i++) {
+        const hexChar = this.walker.consume(isHexCharacter, 'Invalid escape sequence, expected hexadecimal digit at position ' + this.walker.getCurrentPosition() + 1);
+        hex += hexChar;
+      }
+      return String.fromCharCode(parseInt(hex, 16));
+    };
 
     while (this.walker.peak() !== '"' && !this.walker.isAtEnd()) {
-      value += this.walker.advance();
+      if (this.walker.match(isBackslash)) {
+        if (this.walker.isAtEnd()) break;
+        value += parseEscaped();
+      } else {
+        value += this.walker.consume(isStringCharacter, 'Invalid string character at position ' + this.walker.getCurrentPosition());
+      }
     }
+
     if (this.walker.isAtEnd()) {
       throw new Error('Unterminated string literal, starting at position ' + startPosition); 
     }
