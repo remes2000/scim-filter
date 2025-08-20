@@ -1,5 +1,7 @@
 import { CompareLogicalOperator, IdentifierToken, Operator, ValueToken } from "../lexer/types";
 
+type Attribute = Array<IdentifierToken['value']>;
+
 export type Filter = 
   | AttributeExpression
   | LogicalExpression
@@ -11,18 +13,18 @@ type AttributeExpression =
   | UnaryAttributeExpression;
 
 interface UnaryAttributeExpression {
-  attribute: IdentifierToken['value'];
+  attribute: Attribute;
   operator: 'pr';
 }
 
 interface ComparisionAttributeExpression {
-  attribute: IdentifierToken['value'];
+  attribute: Attribute;
   operator: Exclude<Operator, 'pr'>;
   value: ValueToken['value'];
 }
 
 interface ValuePathExpression {
-  attribute: IdentifierToken['value'];
+  attribute: Attribute;
   operator: 'valuePath';
   filters: [Filter]
 }

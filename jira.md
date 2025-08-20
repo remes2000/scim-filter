@@ -1,8 +1,9 @@
 # Required
 [ ] Use NX
 [ ] Improve the lexer, handle scim paths
-[ ] Handle sub-attributes in parser
+[x] Handle sub-attributes in parser
 [ ] Create and expose custom error class, so that customers can catch it
+[ ] Make parser accept a string, not the list of tokens
 [x] Improve the lexer, move away from state machine approach
 [x] Improve the lexer, handle JSON numbers
 [x] Handle escaped quotes in lexer

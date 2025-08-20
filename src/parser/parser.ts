@@ -1,4 +1,4 @@
-import { IdentifierToken, isCloseParenthesis, isCloseSquareParenthesis, isIdentifier, isLogicalOperator, isOpenParenthesis, isOpenSquareParenthesis, isOperator, isValueToken, LogicalOperatorToken, Token } from "../lexer/types";
+import { DotToken, IdentifierToken, isCloseParenthesis, isCloseSquareParenthesis, isDot, isIdentifier, isLogicalOperator, isOpenParenthesis, isOpenSquareParenthesis, isOperator, isValueToken, LogicalOperatorToken, Token } from "../lexer/types";
 import { Walker } from "../walker/walker";
 import { Filter } from "./types";
 
@@ -57,7 +57,7 @@ export class Parser {
       return grouping;
     }
 
-    const { value: attribute } = this.walker.consume(isIdentifier, 'Expected identifier');
+    const attribute = this.attribute();
     const valuePath = this.valuePath();
     if (valuePath) {
       return { attribute, operator: 'valuePath', filters: [valuePath] }
@@ -87,5 +87,14 @@ export class Parser {
     return expression;
    }
    return null;
+  }
+
+  attribute(): Array<IdentifierToken['value']> {
+    const attribute: Array<IdentifierToken['value']> = [];
+    do {
+      const identifier = this.walker.consume(isIdentifier, 'Expected identifier');
+      attribute.push(identifier.value);
+    } while (this.walker.match(isDot));
+    return attribute;
   }
 }
