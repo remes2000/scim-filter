@@ -1,11 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { Parser } from './parser';
-import { Lexer } from '../lexer/lexer';
 import { Filter } from './types';
 
 const check = (expression: string, expected: Filter) => {
-  const tokens = new Lexer(expression).parse();
-  const parsedTree = new Parser(tokens).parse();
+  const parsedTree = new Parser(expression).parse();
   expect(parsedTree).toEqual(expected);
 };
 
@@ -72,8 +70,7 @@ describe('Parser', () => {
   });
 
   it('should throw error when not is not before grouping', () => {
-    const tokens = new Lexer('not userName eq "john"').parse();
-    expect(() => new Parser(tokens).parse()).toThrow('Expected group after "not" operator');
+    expect(() => new Parser('not userName eq "john"').parse()).toThrow('Expected group after "not" operator');
   });
 
   it('should parse value path with logical operator', () => {

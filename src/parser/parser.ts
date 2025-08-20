@@ -1,13 +1,15 @@
 import { DotToken, IdentifierToken, isCloseParenthesis, isCloseSquareParenthesis, isDot, isIdentifier, isLogicalOperator, isOpenParenthesis, isOpenSquareParenthesis, isOperator, isValueToken, LogicalOperatorToken, Token } from "../lexer/types";
+import { Lexer } from "../lexer/lexer";
 import { Walker } from "../walker/walker";
 import { Filter } from "./types";
 
 export class Parser {
   private walker: Walker<Token>;
 
-  // TODO: We should have string as an input, not a list of tokens
-  constructor(private readonly tokens: Token[]) {
-    this.walker = new Walker(this.tokens);
+  constructor(input: string) {
+    const lexer = new Lexer(input);
+    const tokens = lexer.parse();
+    this.walker = new Walker(tokens);
   }
 
   parse(): Filter {
