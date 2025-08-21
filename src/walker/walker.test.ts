@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Walker } from './walker';
+import { ScimFilterError } from '../errors';
 
 describe('Walker', () => {
   describe('constructor', () => {
@@ -110,7 +111,7 @@ describe('Walker', () => {
     it('should throw error when predicate does not match', () => {
       const walker = new Walker(['a', 'b', 'c']);
       const isB = (symbol: string): symbol is 'b' => symbol === 'b';
-      expect(() => walker.consume(isB, 'Expected b')).toThrow('Expected b');
+      expect(() => walker.consume(isB, 'Expected b')).toThrow(new ScimFilterError('Expected b'));
       expect(walker.peak()).toBe('a'); // Should not advance
     });
 
@@ -118,7 +119,7 @@ describe('Walker', () => {
       const walker = new Walker(['a']);
       walker.advance();
       const isA = (symbol: string): symbol is 'a' => symbol === 'a';
-      expect(() => walker.consume(isA, 'Expected a')).toThrow('Expected a');
+      expect(() => walker.consume(isA, 'Expected a')).toThrow(new ScimFilterError('Expected a'));
       expect(walker.peak()).toBeNull();
     });
   });

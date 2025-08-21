@@ -1,3 +1,5 @@
+import { ScimFilterError } from '../errors';
+
 type CheckPredicate<T, S extends T = T> = (symbol: T) => symbol is S;
 
 export class Walker<T> {
@@ -8,13 +10,13 @@ export class Walker<T> {
   consume<S extends T>(predicate: CheckPredicate<T, S>, errorMessage: string): S {
     const element = this.peak();
     if (element === null) {
-      throw new Error(errorMessage);
+      throw new ScimFilterError(errorMessage);
     }
     if (predicate(element)) {
       this.advance();
       return element;
     }
-    throw new Error(errorMessage);
+    throw new ScimFilterError(errorMessage);
   }
 
   match(predicate: CheckPredicate<T>): boolean {

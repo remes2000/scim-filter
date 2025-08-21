@@ -2,6 +2,7 @@ import { DotToken, IdentifierToken, isCloseParenthesis, isCloseSquareParenthesis
 import { Lexer } from "../lexer/lexer";
 import { Walker } from "../walker/walker";
 import { Filter } from "./types";
+import { ScimFilterError } from "../errors";
 
 export class Parser {
   private walker: Walker<Token>;
@@ -45,7 +46,7 @@ export class Parser {
     if (this.walker.match(notPredicate)) {
       const group = this.grouping();
       if (!group) {
-        throw new Error('Expected group after "not" operator');
+        throw new ScimFilterError('Expected group after "not" operator');
       }
       return { operator: 'not', filters: [group] };
     }

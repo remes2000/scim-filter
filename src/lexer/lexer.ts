@@ -1,6 +1,7 @@
 import { Walker } from "../walker/walker";
 import { LOGICAL_OPERATORS, OPERATORS } from "./constants";
 import { LogicalOperator, Operator, Token } from "./types";
+import { ScimFilterError } from "../errors";
 
 const isAlpha = (char: string | null): char is string => {
   if (char === null) {
@@ -64,7 +65,7 @@ export class Lexer {
     } else if (isWhitespace(char)) {
       return;
     } else {
-      throw new Error(`Invalid character '${char}' at position ${this.walker.getCurrentPosition() - 1}`);
+      throw new ScimFilterError(`Invalid character '${char}' at position ${this.walker.getCurrentPosition() - 1}`);
     }
   }
 
@@ -120,11 +121,11 @@ export class Lexer {
       } else if (this.walker.match(isTab)) {
         return '\t';
       }
-      this.walker.consume(isU, 'Invalid escape sequence, expected escapable character at position ' + this.walker.getCurrentPosition() + 1);
+      this.walker.consume(isU, 'Invalid escape sequence, expected escapable character at position ' + (this.walker.getCurrentPosition() + 1));
       let hex = '';
       // Now let's read 4 hexadecimal digits
       for (let i = 0; i < 4; i++) {
-        const hexChar = this.walker.consume(isHexCharacter, 'Invalid escape sequence, expected hexadecimal digit at position ' + this.walker.getCurrentPosition() + 1);
+        const hexChar = this.walker.consume(isHexCharacter, 'Invalid escape sequence, expected hexadecimal digit at position ' + (this.walker.getCurrentPosition() + 1));
         hex += hexChar;
       }
       return String.fromCharCode(parseInt(hex, 16));
@@ -140,7 +141,7 @@ export class Lexer {
     }
 
     if (this.walker.isAtEnd()) {
-      throw new Error('Unterminated string literal, starting at position ' + startPosition); 
+      throw new ScimFilterError('Unterminated string literal, starting at position ' + startPosition); 
     }
     this.walker.advance(); // consume the closing quote
     this.tokens.push({ type: 'String', value });
@@ -154,7 +155,7 @@ export class Lexer {
       number += this.walker.consume(isDigit, 'Invalid number format, expected digit at position ' + this.walker.getCurrentPosition());
     }
     if (number.endsWith('0') && this.walker.check(isDigit)) {
-      throw new Error('Invalid number format, leading zeros are not allowed at position ' + ( this.walker.getCurrentPosition() - 1));
+      throw new ScimFilterError('Invalid number format, leading zeros are not allowed at position ' + ( this.walker.getCurrentPosition() - 1));
     }
     // Read the rest of digits
     while (this.walker.check(isDigit)) {

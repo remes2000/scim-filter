@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { Parser } from './parser';
 import { Filter } from './types';
+import { ScimFilterError } from '../errors';
 
 const check = (expression: string, expected: Filter) => {
   const parsedTree = new Parser(expression).parse();
@@ -70,7 +71,7 @@ describe('Parser', () => {
   });
 
   it('should throw error when not is not before grouping', () => {
-    expect(() => new Parser('not userName eq "john"').parse()).toThrow('Expected group after "not" operator');
+    expect(() => new Parser('not userName eq "john"').parse()).toThrow(new ScimFilterError('Expected group after "not" operator'));
   });
 
   it('should parse value path with logical operator', () => {
