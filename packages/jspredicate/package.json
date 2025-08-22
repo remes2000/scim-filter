@@ -1,0 +1,30 @@
+{
+  "name": "@scim-filter/jspredicate",
+  "version": "1.0.0",
+  "description": "A SCIM filter parser that outputs a JavaScript predicate function. No dependencies.",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "vitest",
+    "test": "vitest run",
+    "ci": "pnpm build"
+  },
+  "keywords": [
+    "SCIM",
+    "filter",
+    "parser",
+    "JSON",
+    "no dependencies",
+    "predicate",
+    "javascript predicate",
+    "javascript filter"
+  ],
+  "author": "Michal Nieruchalski <nieruchalskimichal@gmail.com>",
+  "license": "MIT",
+  "peerDependencies": {
+    "@scim-filter/parse": "workspace:^"
+  },
+  "devDependencies": {
+    "@scim-filter/parse": "workspace:^"
+  }
+}

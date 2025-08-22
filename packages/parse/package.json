@@ -2,7 +2,9 @@
   "name": "@scim-filter/parse",
   "version": "1.0.0",
   "description": "SCIM filter parser with no dependencies",
-  "main": "index.js",
+  "files": ["dist"],
+  "type": "module",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "start": "vitest",

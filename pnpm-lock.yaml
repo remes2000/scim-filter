@@ -15,6 +15,12 @@ importers:
         specifier: ^3.2.4
         version: 3.2.4
 
+  packages/jspredicate:
+    devDependencies:
+      '@scim-filter/parse':
+        specifier: workspace:^
+        version: link:../parse
+
   packages/parse: {}
 
 packages:

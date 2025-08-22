@@ -1,6 +1,9 @@
 # Required
-[ ] Use pnpm workspaces
 [ ] Improve the lexer, handle scim paths
+[ ] Setup library according to the article
+[ ] Publish it on npm
+[ ] Create basic js-filter implementation
+[x] Use pnpm workspaces
 [x] Handle sub-attributes in parser
 [x] Create and expose custom error class, so that customers can catch it
 [x] Make parser accept a string, not the list of tokens
