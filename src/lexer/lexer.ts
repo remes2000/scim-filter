@@ -121,11 +121,11 @@ export class Lexer {
       } else if (this.walker.match(isTab)) {
         return '\t';
       }
-      this.walker.consume(isU, 'Invalid escape sequence, expected escapable character at position ' + (this.walker.getCurrentPosition() + 1));
+      this.walker.consume(isU, 'Invalid escape sequence, expected escapable character at position ' + this.walker.getCurrentPosition());
       let hex = '';
       // Now let's read 4 hexadecimal digits
       for (let i = 0; i < 4; i++) {
-        const hexChar = this.walker.consume(isHexCharacter, 'Invalid escape sequence, expected hexadecimal digit at position ' + (this.walker.getCurrentPosition() + 1));
+        const hexChar = this.walker.consume(isHexCharacter, 'Invalid escape sequence, expected hexadecimal digit at position ' + this.walker.getCurrentPosition());
         hex += hexChar;
       }
       return String.fromCharCode(parseInt(hex, 16));

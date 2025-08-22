@@ -555,10 +555,13 @@ const errorTestCases: { input: string; expectedError: string }[] = [
     input: '"\\',
     expectedError: 'Unterminated string literal, starting at position 0'
   },
-  // TODO: fix this test case
+  {
+    input: '"\\a"',
+    expectedError: 'Invalid escape sequence, expected escapable character at position 2'
+  },
   {
     input: '"\\u1"',
-    expectedError: 'Invalid escape sequence, expected hexadecimal digit at position 3'
+    expectedError: 'Invalid escape sequence, expected hexadecimal digit at position 4'
   },
   { 
     input: '"' + BACKSPACE + '"',
