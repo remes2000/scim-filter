@@ -1,0 +1,21 @@
+{
+  "name": "@scim-filter/parse",
+  "version": "1.0.0",
+  "description": "SCIM filter parser with no dependencies",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "vitest",
+    "test": "vitest run",
+    "ci": "pnpm build"
+  },
+  "keywords": [
+    "SCIM",
+    "filter",
+    "parser",
+    "JSON",
+    "no dependencies"
+  ],
+  "author": "Michal Nieruchalski <nieruchalskimichal@gmail.com>",
+  "license": "MIT"
+}

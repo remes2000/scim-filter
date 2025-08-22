@@ -1,23 +1,16 @@
 {
-  "name": "scim-filter",
-  "version": "1.0.0",
-  "description": "SCIM filter parser with no dependencies",
-  "main": "index.js",
+  "name": "@scim-filter/monorepo",
+  "private": true,
   "scripts": {
-    "build": "tsc",
-    "start": "vitest",
+    "build": "pnpm -r --filter=\"./packages/*\" run build",
     "test": "vitest run",
+    "start": "vitest",
     "ci": "pnpm build"
   },
-  "keywords": [
-    "SCIM",
-    "filter",
-    "parser",
-    "JSON",
-    "no dependencies"
-  ],
-  "author": "Michal Nieruchalski <nieruchalskimichal@gmail.com>",
-  "license": "MIT",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=10.0.0"
+  },
   "devDependencies": {
     "typescript": "^5.8.3",
     "vitest": "^3.2.4"
