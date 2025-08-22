@@ -1,5 +1,5 @@
 # Required
-[ ] Use NX
+[ ] Use pnpm workspaces
 [ ] Improve the lexer, handle scim paths
 [x] Handle sub-attributes in parser
 [x] Create and expose custom error class, so that customers can catch it
@@ -14,3 +14,4 @@
 [ ] Cleanup parser code
 [x] Create a generic class to move through tokens/symbols?
 [ ] Setup github actions
+[ ] Setup better error messages pointing exactly where the problem is
