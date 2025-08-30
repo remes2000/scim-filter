@@ -1,4 +1,4 @@
-import { Parser } from '@scim-filter/parse';
+import { Filter, Parser } from '@scim-filter/parse';
 
 type Predicate<T> = (value: T, index: number, array: T[]) => boolean;
 type Value = string | number | boolean | null;
@@ -119,25 +119,41 @@ const pr = (attributeValueOpt: Optional<Value>) => {
   return false;
 };
 
+/*
+  Value path operator.
+*/
+const valuePath = (attributeValueOpt: Optional<Value>, filter: Filter) => {
+  if (!hasValue(attributeValueOpt)) {
+    return false;
+  }
+  // TODO: this is not correct and I have to fix it. attributeValueOpt.value could be string for example - thats not too good
+  return matches(attributeValueOpt.value, filter);
+};
+
 const binaryOperatorMap = { eq, ne, sw, ew, co };
+const binaryFilterOperatorMap = { valuePath };
 const unaryOperatorMap = { pr };
 
 export const createFilter = <T extends object>(rule: string): Predicate<T> => {
   const ast = new Parser(rule).parse();
+  return (value: T, index: number, array: T[]) => matches(value, ast);
+};
 
-  return (value: T, index: number, array: T[]) => {
-    switch (ast.operator) {
-      case 'eq':
-      case 'ne':
-      case 'sw':
-      case 'ew':
-      case 'co':
-        return binaryOperatorMap[ast.operator](get(value, ast.attribute), ast.value);
-      case 'pr':
-        return unaryOperatorMap[ast.operator](get(value, ast.attribute));
-    }
-    return false;
-  };
+const matches = <T>(value: T, filter: Filter): boolean => {
+  switch (filter.operator) {
+    case 'eq':
+    case 'ne':
+    case 'sw':
+    case 'ew':
+    case 'co':
+      return binaryOperatorMap[filter.operator](get(value, filter.attribute), filter.value);
+    case 'pr':
+      return unaryOperatorMap[filter.operator](get(value, filter.attribute));
+    case 'valuePath':
+      // TODO: Am I sure that the user can just filter.filters[0] will there always be just one filter?
+      return binaryFilterOperatorMap[filter.operator](get(value, filter.attribute), filter.filters[0])
+  }
+  return false;
 };
 
 const get = (object: any, key: Array<string>): Optional<Value> => {

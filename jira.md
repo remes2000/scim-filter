@@ -5,6 +5,8 @@
 [ ] Create basic js-filter implementation
 [ ] Add error type in js-filter
 [ ] Make sure on how should be case-sensitivity handled for string attributes
+[ ] Handle dates in gt, lt, gte, lte operators 
+[ ] Attribute names and attribute operators should be case insensitive
 [x] Use pnpm workspaces
 [x] Handle sub-attributes in parser
 [x] Create and expose custom error class, so that customers can catch it
