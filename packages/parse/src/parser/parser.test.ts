@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { Parser } from './parser';
-import { Filter } from './types';
-import { ScimFilterError } from '../errors';
+import { Parser } from './parser.js';
+import { Filter } from './types.js';
+import { ScimFilterError } from '../errors.js';
 
 const check = (expression: string, expected: Filter) => {
   const parsedTree = new Parser(expression).parse();

@@ -1,7 +1,7 @@
-import { Walker } from "../walker/walker";
-import { LOGICAL_OPERATORS, OPERATORS } from "./constants";
-import { LogicalOperator, Operator, Token } from "./types";
-import { ScimFilterError } from "../errors";
+import { Walker } from "../walker/walker.js";
+import { LOGICAL_OPERATORS, OPERATORS } from "./constants.js";
+import { LogicalOperator, Operator, Token } from "./types.js";
+import { ScimFilterError } from "../errors.js";
 
 const isAlpha = (char: string | null): char is string => {
   if (char === null) {

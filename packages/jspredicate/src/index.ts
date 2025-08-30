@@ -1,1 +1,1 @@
-export { createFilter } from './filter/filter';
+export { createFilter } from './filter/filter.js';

@@ -3,6 +3,7 @@
 [ ] Setup library according to the article
 [ ] Publish it on npm
 [ ] Create basic js-filter implementation
+[ ] Add error type in js-filter
 [x] Use pnpm workspaces
 [x] Handle sub-attributes in parser
 [x] Create and expose custom error class, so that customers can catch it

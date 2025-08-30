@@ -1,3 +1,3 @@
-export type { ScimFilterError } from './errors';
-export { Parser } from './parser/parser';
-export type { Filter } from './parser/types';
+export type { ScimFilterError } from './errors.js';
+export { Parser } from './parser/parser.js';
+export type { Filter } from './parser/types.js';

@@ -1,8 +1,8 @@
-import { DotToken, IdentifierToken, isCloseParenthesis, isCloseSquareParenthesis, isDot, isIdentifier, isLogicalOperator, isOpenParenthesis, isOpenSquareParenthesis, isOperator, isValueToken, LogicalOperatorToken, Token } from "../lexer/types";
-import { Lexer } from "../lexer/lexer";
-import { Walker } from "../walker/walker";
-import { Filter } from "./types";
-import { ScimFilterError } from "../errors";
+import { DotToken, IdentifierToken, isCloseParenthesis, isCloseSquareParenthesis, isDot, isIdentifier, isLogicalOperator, isOpenParenthesis, isOpenSquareParenthesis, isOperator, isValueToken, LogicalOperatorToken, Token } from "../lexer/types.js";
+import { Lexer } from "../lexer/lexer.js";
+import { Walker } from "../walker/walker.js";
+import { Filter } from "./types.js";
+import { ScimFilterError } from "../errors.js";
 
 export class Parser {
   private walker: Walker<Token>;

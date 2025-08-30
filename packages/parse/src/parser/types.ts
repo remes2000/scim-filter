@@ -1,4 +1,4 @@
-import { CompareLogicalOperator, IdentifierToken, Operator, ValueToken } from "../lexer/types";
+import { CompareLogicalOperator, IdentifierToken, Operator, ValueToken } from "../lexer/types.js";
 
 type Attribute = Array<IdentifierToken['value']>;
 

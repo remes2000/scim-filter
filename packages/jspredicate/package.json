@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A SCIM filter parser that outputs a JavaScript predicate function. No dependencies.",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "start": "vitest",

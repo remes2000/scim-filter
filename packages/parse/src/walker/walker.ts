@@ -1,4 +1,4 @@
-import { ScimFilterError } from '../errors';
+import { ScimFilterError } from '../errors.js';
 
 type CheckPredicate<T, S extends T = T> = (symbol: T) => symbol is S;
 

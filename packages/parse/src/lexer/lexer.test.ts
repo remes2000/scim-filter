@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { Lexer } from './lexer';
-import { Token } from './types';
-import { ScimFilterError } from '../errors';
+import { Lexer } from './lexer.js';
+import { Token } from './types.js';
+import { ScimFilterError } from '../errors.js';
 
 const BACKSPACE = '\b';
 const TAB = '\t';

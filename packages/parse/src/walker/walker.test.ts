@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { Walker } from './walker';
-import { ScimFilterError } from '../errors';
+import { Walker } from './walker.js';
+import { ScimFilterError } from '../errors.js';
 
 describe('Walker', () => {
   describe('constructor', () => {
