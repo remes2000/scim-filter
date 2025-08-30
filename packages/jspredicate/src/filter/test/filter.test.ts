@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createFilter } from "./filter.js";
+import { createFilter } from "../filter.js";
 
 describe('Filter', () => {
   const filterArray = (array: Array<object>, filter: string) =>
