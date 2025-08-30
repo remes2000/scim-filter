@@ -34,6 +34,11 @@ describe('Filter: sw operator', () => {
       .toThrow('Value for \'sw\' operator has to be a string. 123 is not a string.');
   });
 
+  it('should return false when attribute is not present', () => {
+    const users = [{}];
+    expect(filterArray(users, 'age sw "25"')).toEqual([]);
+  });
+
   it('should return false when attribute value is not a string', () => {
     const users = [{ age: 25 }, { age: null }, { age: undefined }];
     expect(filterArray(users, 'age sw "25"')).toEqual([]);

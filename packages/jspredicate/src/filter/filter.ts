@@ -52,6 +52,13 @@ const sw = (attributeValueOpt: Optional<Value>, value: unknown) => {
   return attributeValue.startsWith(value);
 };
 
+/*
+  Ends with operator. Works only for string.
+  It's case sensitive.
+  If provided compare value is not a string it throws an error.
+  For missing attribute it always returns false.
+  If the attribute is not a string it returns false.
+*/
 const ew = (attributeValueOpt: Optional<Value>, value: unknown) => {
   if (!hasValue(attributeValueOpt)) {
     return false;
@@ -65,6 +72,28 @@ const ew = (attributeValueOpt: Optional<Value>, value: unknown) => {
     return false;
   }
   return attributeValue.endsWith(value);
+};
+
+/*
+  Contains operator. Works only for string.
+  It's case sensitive.
+  If provided compare value is not a string it throws an error.
+  For missing attribute it always returns false.
+  If the attribute is not a string it returns false.
+*/
+const co = (attributeValueOpt: Optional<Value>, value: unknown) => {
+  if (!hasValue(attributeValueOpt)) {
+    return false;
+  }
+
+  const attributeValue = attributeValueOpt.value;
+  if (typeof value !== 'string') {
+    throw new Error(`Value for \'co\' operator has to be a string. ${value} is not a string.`);
+  }
+  if (typeof attributeValue !== 'string') {
+    return false;
+  }
+  return attributeValue.includes(value);
 };
 
 /*
@@ -90,7 +119,7 @@ const pr = (attributeValueOpt: Optional<Value>) => {
   return false;
 };
 
-const binaryOperatorMap = { eq, ne, sw, ew };
+const binaryOperatorMap = { eq, ne, sw, ew, co };
 const unaryOperatorMap = { pr };
 
 export const createFilter = <T extends object>(rule: string): Predicate<T> => {
@@ -101,7 +130,8 @@ export const createFilter = <T extends object>(rule: string): Predicate<T> => {
       case 'eq':
       case 'ne':
       case 'sw':
-      case 'ew': 
+      case 'ew':
+      case 'co':
         return binaryOperatorMap[ast.operator](get(value, ast.attribute), ast.value);
       case 'pr':
         return unaryOperatorMap[ast.operator](get(value, ast.attribute));
