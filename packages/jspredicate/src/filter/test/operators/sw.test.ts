@@ -14,7 +14,7 @@ describe('Filter: sw operator', () => {
       .toEqual([ { firstName: 'Michal', lastName: 'Nieruchalski' } ]);
   });
 
-  it('firstName sw "Michal"', () => {
+  it('should return true for full match firstName sw "Michal"', () => {
     const users = [
       { firstName: 'Michal', lastName: 'Nieruchalski' },
       { firstName: 'Jan', lastName: 'Kowalski' }
@@ -23,21 +23,19 @@ describe('Filter: sw operator', () => {
       .toEqual([ { firstName: 'Michal', lastName: 'Nieruchalski' } ]);
   });
 
+  it('sw should be case sensitive firstName sw "mi"', () => {
+    const users = [{ firstName: 'Michal' },];
+    expect(filterArray(users, 'firstName sw "mi"')).toEqual([]);
+  });
+
   it('should throw error when sw operator value is not a string', () => {
     const users = [{ firstName: 'Michal', lastName: 'Nieruchalski' }];
     expect(() => filterArray(users, 'firstName sw 123'))
-      .toThrow('Value for \'sw\' operator has to be a string. \'123\' is not a string.');
+      .toThrow('Value for \'sw\' operator has to be a string. 123 is not a string.');
   });
 
-  it('should throw error when attribute value is not a string for sw operator', () => {
-    const users = [{ firstName: 'Michal', age: 25 }];
-    expect(() => filterArray(users, 'age sw "25"'))
-      .toThrow('Attribute value for \'sw\' operator has to be a string. Non-string value encountered.');
-  });
-
-  it('should handle null and undefined attribute values for sw operator', () => {
-    const users = [{ firstName: 'Michal' }, { firstName: null }, { firstName: undefined }]; 
-    expect(filterArray(users, 'firstName sw "Mi"'))
-      .toEqual([ { firstName: 'Michal' } ]);
+  it('should return false when attribute value is not a string', () => {
+    const users = [{ age: 25 }, { age: null }, { age: undefined }];
+    expect(filterArray(users, 'age sw "25"')).toEqual([]);
   });
 });

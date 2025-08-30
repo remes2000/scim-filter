@@ -2,23 +2,40 @@ import { Parser } from '@scim-filter/parse';
 
 type Predicate<T> = (value: T, index: number, array: T[]) => boolean;
 type Value = string | number | boolean | null;
-type Optional<T> = { hasValue: true, value: Value } | { hasValue: false };
-const hasValue = <T>(o: Optional<T>): o is { hasValue: true, value: Value } => o.hasValue;
+type Optional<T> = { hasValue: true, value: T } | { hasValue: false };
+const hasValue = <T>(o: Optional<T>): o is { hasValue: true, value: T } => o.hasValue;
 
+/*
+  Equal operator.
+  For missing attribute is always returns false.
+  In other cases, it compares the values using ===
+*/
 const eq = (attributeValue: Optional<Value>, value: unknown) => {
   if (!hasValue(attributeValue)) {
     return false;
   }
   return attributeValue.value === value;
 }
+
+/*
+  Not equal operator.
+  For missing attribute it always returns true.
+  In other cases, it compares the values using !==
+*/
 const ne = (attributeValue: Optional<Value>, value: unknown) => {
   if (!hasValue(attributeValue)) {
-    return false;
+    return true;
   }
   return attributeValue.value !== value
 };
-// TODO: consider if it should be case insensitive
-// TODO: add better test case descriptions
+
+/*
+  Starts with operator. Works only for string.
+  It's case sensitive.
+  If provided compare value is not a string it throws an error.
+  For missing attribute it always returns false.
+  If the attribute is not a string it returns false.
+*/
 const sw = (attributeValueOpt: Optional<Value>, value: unknown) => {
   if (!hasValue(attributeValueOpt)) {
     return false;
@@ -26,32 +43,49 @@ const sw = (attributeValueOpt: Optional<Value>, value: unknown) => {
 
   const attributeValue = attributeValueOpt.value;
   if (typeof value !== 'string') {
-    throw new Error(`Value for \'sw\' operator has to be a string. '${value}' is not a string.`);
+    throw new Error(`Value for \'sw\' operator has to be a string. ${value} is not a string.`);
   }
-  if (typeof attributeValue !== 'string' && attributeValue !== null && attributeValue !== undefined) {
-    throw new Error('Attribute value for \'sw\' operator has to be a string. Non-string value encountered.');
+
+  if (typeof attributeValue !== 'string') {
+    return false;
   }
-  return (attributeValue ?? '').startsWith(value);
+  return attributeValue.startsWith(value);
 };
+
 const ew = (attributeValueOpt: Optional<Value>, value: unknown) => {
   if (!hasValue(attributeValueOpt)) {
     return false;
   }
 
-  const attributeValue= attributeValueOpt.value;
+  const attributeValue = attributeValueOpt.value;
   if (typeof value !== 'string') {
-    throw new Error(`Value for \'ew\' operator has to be a string. '${value}' is not a string.`);
+    throw new Error(`Value for \'ew\' operator has to be a string. ${value} is not a string.`);
   }
-  if (typeof attributeValue !== 'string' && attributeValue !== null && attributeValue !== undefined) {
-    throw new Error('Attribute value for \'ew\' operator has to be a string. Non-string value encountered.');
+  if (typeof attributeValue !== 'string') {
+    return false;
   }
-  return (attributeValue ?? '').endsWith(value);
+  return attributeValue.endsWith(value);
 };
 
+/*
+  Present operator.
+  For missing attribute, it always returns false.
+  If the attribute is undefined it returns false.
+  If the attribute is null it returns false.
+  If the attribute is '' (empty string) it returns false.
+  If the attribute is [] (empty array) it returns false.
+  Otherwise returns true.
+*/
 const pr = (attributeValueOpt: Optional<Value>) => {
   if (hasValue(attributeValueOpt)) {
     const attributeValue = attributeValueOpt.value;
-    return attributeValue !== null && attributeValue !== undefined;
+    return (
+      attributeValue !== null &&
+      attributeValue !== undefined &&
+      attributeValue !== '' &&
+      !(Array.isArray(attributeValue) && attributeValue.length === 0) &&
+      !(typeof attributeValue === 'object' && Object.keys(attributeValue).length === 0)
+    )
   }
   return false;
 };
@@ -76,7 +110,7 @@ export const createFilter = <T extends object>(rule: string): Predicate<T> => {
   };
 };
 
-const get = (object: any, key: Array<string>): { hasValue: true, value: Value } | { hasValue: false } => {
+const get = (object: any, key: Array<string>): Optional<Value> => {
   let current: any = object;
   for (const k of key) {
     if (current && typeof current === 'object' && k in current) {

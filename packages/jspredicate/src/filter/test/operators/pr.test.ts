@@ -6,28 +6,38 @@ const filterArray = (array: Array<object>, filter: string) =>
 
 describe('Filter: pr operator', () => {
   it('firstName pr', () => {
-    const users = [{ firstName: 'Michal' }];
+    const users = [{ firstName: 'Michal' }, { lastName: 'John' }];
     expect(filterArray(users, 'firstName pr'))
       .toEqual([ { firstName: 'Michal' } ]);
   });
 
-  it('pr on null should filter out the object', () => {
+  it('should return false when null pr', () => {
     const users = [{ firstName: 'Michal' }, { firstName: null }];
     expect(filterArray(users, 'firstName pr'))
       .toEqual([{ firstName: 'Michal' }]);
   });
 
-  it('pr on undefined should filter out the object', () => {
+  it('should return false when undefined pr', () => {
     const users = [{ firstName: 'Michal' }, { firstName: undefined }];
     expect(filterArray(users, 'firstName pr'))
       .toEqual([{ firstName: 'Michal' }]);
   });
 
-  it('pr on missing attribute should filter out the object', () => {
-    const users = [{ firstName: 'Michal' }, { lastName: 'Kowalski' }];
+  it('should return false when \'\' pr', () => {
+    const users = [{ firstName: 'Michal' }, { firstName: '' }];
     expect(filterArray(users, 'firstName pr'))
       .toEqual([{ firstName: 'Michal' }]);
   });
 
-  // TODO: how about empty string, empty array, empty object, 0, false?
+  it('should return false when [] pr', () => {
+    const users = [{ firstName: 'Michal' }, { firstName: [] }];
+    expect(filterArray(users, 'firstName pr'))
+      .toEqual([{ firstName: 'Michal' }]);
+  });
+
+  it('should return false when {} pr', () => {
+    const users = [{ firstName: 'Michal' }, { firstName: {} }];
+    expect(filterArray(users, 'firstName pr'))
+      .toEqual([{ firstName: 'Michal' }]);
+  });
 });

@@ -4,6 +4,7 @@
 [ ] Publish it on npm
 [ ] Create basic js-filter implementation
 [ ] Add error type in js-filter
+[ ] Make sure on how should be case-sensitivity handled for string attributes
 [x] Use pnpm workspaces
 [x] Handle sub-attributes in parser
 [x] Create and expose custom error class, so that customers can catch it
