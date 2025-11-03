@@ -27,4 +27,9 @@ describe('Filter: valuePath operator', () => {
     const users = [{ name: 'Michal' }];
     expect(filterArray(users, 'address[street eq "Foksal"]')).toEqual([]);
   });
+
+  it('should return false when attribute is not an object', () => {
+    const users = [{ name: 'Michal' }];
+    expect(filterArray(users, 'name[first sw "Pi"]')).toEqual([]);
+  });
 });

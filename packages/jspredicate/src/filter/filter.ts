@@ -1,7 +1,7 @@
 import { Filter, Parser } from '@scim-filter/parse';
 
 type Predicate<T> = (value: T, index: number, array: T[]) => boolean;
-type Value = string | number | boolean | null;
+type Value = string | number | boolean | null | object;
 type Optional<T> = { hasValue: true, value: T } | { hasValue: false };
 const hasValue = <T>(o: Optional<T>): o is { hasValue: true, value: T } => o.hasValue;
 
@@ -26,7 +26,7 @@ const ne = (attributeValue: Optional<Value>, value: unknown) => {
   if (!hasValue(attributeValue)) {
     return true;
   }
-  return attributeValue.value !== value
+  return attributeValue.value !== value;
 };
 
 /*
@@ -126,7 +126,11 @@ const valuePath = (attributeValueOpt: Optional<Value>, filter: Filter) => {
   if (!hasValue(attributeValueOpt)) {
     return false;
   }
-  // TODO: this is not correct and I have to fix it. attributeValueOpt.value could be string for example - thats not too good
+
+  if (typeof attributeValueOpt.value !== 'object') {
+    return false;
+  }
+
   return matches(attributeValueOpt.value, filter);
 };
 
@@ -152,6 +156,12 @@ const matches = <T>(value: T, filter: Filter): boolean => {
     case 'valuePath':
       // TODO: Am I sure that the user can just filter.filters[0] will there always be just one filter?
       return binaryFilterOperatorMap[filter.operator](get(value, filter.attribute), filter.filters[0])
+    case 'and':
+      return filter.filters.every(f => matches(value, f));
+    case 'or':
+      return filter.filters.some(f => matches(value, f))
+    case 'not':
+      return filter.filters.every(f => !matches(value, f));
   }
   return false;
 };
