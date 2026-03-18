@@ -1,0 +1,149 @@
+.app {
+  display: flex;
+  gap: 2rem;
+  min-height: 100vh;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.panel {
+  padding: 1.5rem;
+}
+
+.panel-left {
+  flex: 0 0 340px;
+  position: sticky;
+  top: 2rem;
+  align-self: flex-start;
+}
+
+.panel-right {
+  flex: 1;
+  min-width: 0;
+}
+
+h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.5rem;
+}
+
+.subtitle {
+  margin: 0 0 1rem;
+  color: #888;
+  font-size: 0.875rem;
+}
+
+.filter-input {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.95rem;
+  font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, monospace;
+  border: 1px solid #444;
+  border-radius: 6px;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.filter-input:focus {
+  border-color: #646cff;
+}
+
+.error {
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: #3a1c1c;
+  border: 1px solid #7a3333;
+  border-radius: 6px;
+  color: #ff8a8a;
+  font-size: 0.825rem;
+  font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, monospace;
+  white-space: pre-wrap;
+}
+
+.match-count {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: #aaa;
+}
+
+.examples {
+  margin-top: 1.5rem;
+  font-size: 0.825rem;
+  color: #777;
+}
+
+.examples p {
+  margin: 0 0 0.5rem;
+}
+
+.examples ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.examples code {
+  background: #1a1a2e;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: #b0b0d0;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.75rem;
+}
+
+.card {
+  background: #1a1a2e;
+  border: 1px solid #2a2a4a;
+  border-radius: 8px;
+  padding: 0.875rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.key {
+  color: #8888cc;
+  font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, monospace;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+.value {
+  font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, monospace;
+  font-size: 0.8rem;
+  text-align: right;
+}
+
+.value.string {
+  color: #a8d8a8;
+}
+
+.value.number {
+  color: #d4a8e0;
+}
+
+.no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #666;
+  font-size: 0.95rem;
+}
