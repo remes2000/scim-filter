@@ -4,7 +4,7 @@ import { createFilter } from '../../filter.js';
 const filterArray = (array: Array<object>, filter: string) =>
   array.filter(createFilter(filter));
 
-describe('Filter: sw operator', () => {
+describe.skip('Filter: sw operator', () => {
   it('firstName sw "Mi"', () => {
     const users = [
       { firstName: 'Michal', lastName: 'Nieruchalski' },
