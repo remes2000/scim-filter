@@ -18,6 +18,12 @@ const matches = <T>(record: T, filter: Filter): boolean => {
     return co(getFieldValue(record, filter.attribute), filter.value);
   } else if (filter.operator === 'pr') {
     return pr(getFieldValue(record, filter.attribute));
+  } else if (filter.operator === 'and') {
+    return and(record, filter.filters[0], filter.filters[1]);
+  } else if (filter.operator === 'or') {
+    return or(record, filter.filters[0], filter.filters[1]);
+  } else if (filter.operator === 'not') {
+    return not(record, filter.filters[0]);
   }
   return false;
 };
@@ -101,3 +107,35 @@ const co = (fieldValue: Optional<FieldValue>, filterValue: FilterValue): boolean
     return v.toLowerCase().includes(filterValue.toLowerCase());
   });
 };
+
+/**
+ * Tests whether a record satisfies both filter conditions (logical AND).
+ *
+ * @param record - The object to evaluate.
+ * @param filter1 - The first filter condition.
+ * @param filter2 - The second filter condition.
+ * @returns `true` if the record matches both filters, `false` otherwise.
+ */
+const and = <T>(record: T, filter1: Filter, filter2: Filter): boolean =>
+  matches(record, filter1) && matches(record, filter2);
+
+/**
+ * Tests whether a record satisfies at least one of two filter conditions (logical OR).
+ *
+ * @param record - The object to evaluate.
+ * @param filter1 - The first filter condition.
+ * @param filter2 - The second filter condition.
+ * @returns `true` if the record matches either filter, `false` otherwise.
+ */
+const or = <T>(record: T, filter1: Filter, filter2: Filter): boolean =>
+  matches(record, filter1) || matches(record, filter2);
+
+/**
+ * Negates a filter condition (logical NOT).
+ *
+ * @param record - The object to evaluate.
+ * @param filter - The filter condition to negate.
+ * @returns `true` if the record does not match the filter, `false` otherwise.
+ */
+const not = <T>(record: T, filter: Filter): boolean =>
+  !matches(record, filter);

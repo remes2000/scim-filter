@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { createFilter } from "../../filter.js";
 
-describe.skip('Filter: or logical operator', () => {
+describe('Filter: or logical operator', () => {
   const filterArray = (array: Array<object>, filter: string) =>
     array.filter(createFilter(filter));
 
