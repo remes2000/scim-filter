@@ -4,7 +4,7 @@ import { createFilter } from '../../filter.js';
 const filterArray = (array: Array<object>, filter: string) =>
   array.filter(createFilter(filter));
 
-describe.skip('Filter: valuePath operator', () => {
+describe('Filter: valuePath operator', () => {
   it('address[city eq "Poznan"]', () => {
     const users = [
       { name: 'A', address: { city: 'Poznan', street: 'Polwiejska' } },
@@ -30,6 +30,11 @@ describe.skip('Filter: valuePath operator', () => {
 
   it('should return false when attribute is not an object', () => {
     const users = [{ name: 'Michal' }];
+    expect(filterArray(users, 'name[first sw "Pi"]')).toEqual([]);
+  });
+
+  it('should return false when attribute is null', () => {
+    const users = [{ name: null }];
     expect(filterArray(users, 'name[first sw "Pi"]')).toEqual([]);
   });
 });

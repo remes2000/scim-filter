@@ -18,6 +18,8 @@ const matches = <T>(record: T, filter: Filter): boolean => {
     return co(getFieldValue(record, filter.attribute), filter.value);
   } else if (filter.operator === 'pr') {
     return pr(getFieldValue(record, filter.attribute));
+  } else if (filter.operator === 'valuePath') {
+    return valuePath(getFieldValue(record, filter.attribute), filter.filters[0]);
   } else if (filter.operator === 'and') {
     return and(record, filter.filters[0], filter.filters[1]);
   } else if (filter.operator === 'or') {
@@ -87,6 +89,21 @@ const pr = (fieldValue: Optional<FieldValue>): boolean =>
       return Object.keys(v).length > 0;
     }
     return true;
+  });
+
+/**
+ * Tests whether a nested object at the attribute path satisfies a filter condition.
+ *
+ * @param fieldValue - The value extracted from the record at the attribute path, wrapped in Optional.
+ * @param filter - The filter condition to evaluate against the nested object.
+ * @returns `true` if the field value is a non-null object and matches the filter, `false` otherwise.
+ */
+const valuePath = (fieldValue: Optional<FieldValue>, filter: Filter): boolean =>
+  Optional.match(fieldValue, (v) => {
+    if (typeof v === 'object' && v !== null) {
+      return matches(v, filter);
+    }
+    return false;
   });
 
 /**
