@@ -14,6 +14,8 @@ export const createFilter = <T extends object>(rule: string): Predicate<T> => {
 const matches = <T>(record: T, filter: Filter): boolean => {
   if (filter.operator === 'eq') {
     return eq(getFieldValue(record, filter.attribute), filter.value);
+  } else if (filter.operator === 'co') {
+    return co(getFieldValue(record, filter.attribute), filter.value);
   } else if (filter.operator === 'pr') {
     return pr(getFieldValue(record, filter.attribute));
   }
@@ -80,3 +82,22 @@ const pr = (fieldValue: Optional<FieldValue>): boolean =>
     }
     return true;
   });
+
+/**
+ * Tests whether a field value contains the filter value as a case-insensitive substring.
+ *
+ * @param fieldValue - The value extracted from the record at the attribute path, wrapped in Optional.
+ * @param filterValue - The value from the filter rule to search for within the field value.
+ * @returns `true` if both values are strings and the field value contains the filter value, `false` otherwise.
+ */
+const co = (fieldValue: Optional<FieldValue>, filterValue: FilterValue): boolean => {
+  if (typeof filterValue !== 'string') {
+    return false;
+  }
+  return Optional.match(fieldValue, (v) => {
+    if (typeof v !== 'string') {
+      return false;
+    }
+    return v.toLowerCase().includes(filterValue.toLowerCase());
+  });
+};

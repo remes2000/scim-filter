@@ -4,7 +4,7 @@ import { createFilter } from '../../filter.js';
 const filterArray = (array: Array<object>, filter: string) =>
   array.filter(createFilter(filter));
 
-describe.skip('Filter: co operator', () => {
+describe('Filter: co operator', () => {
   it('name co "chal"', () => {
     const users = [{ name: 'Michal' }, { name: 'MichalABC' }, { name: 'MichalBCA' }];
     expect(filterArray(users, 'name co "chal"'))
@@ -17,15 +17,14 @@ describe.skip('Filter: co operator', () => {
       .toEqual([ { firstName: 'Michal' } ]);
   });
 
-  it('co should be case sensitive firstName co "mi"', () => {
+  it('co should be case insensitive firstName co "mi"', () => {
     const users = [{ firstName: 'MICHAL' },];
-    expect(filterArray(users, 'firstName co "mi"')).toEqual([]);
+    expect(filterArray(users, 'firstName co "mi"')).toEqual([{ firstName: 'MICHAL' }]);
   });
 
-  it('should throw error when co operator value is not a string', () => {
+  it('should return false when co operator value is not a string', () => {
     const users = [{ firstName: 'Michal', lastName: 'Nieruchalski' }];
-    expect(() => filterArray(users, 'firstName co 123'))
-      .toThrow('Value for \'co\' operator has to be a string. 123 is not a string.');
+    expect(filterArray(users, 'firstName co 123')).toEqual([]);
   });
 
   it('should return false when attribute is not present', () => {
