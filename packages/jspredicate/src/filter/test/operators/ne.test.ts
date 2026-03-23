@@ -4,7 +4,7 @@ import { createFilter } from '../../filter.js';
 const filterArray = (array: Array<object>, filter: string) =>
   array.filter(createFilter(filter));
 
-describe.skip('Filter: ne operator', () => {
+describe('Filter: ne operator', () => {
   it('firstName ne "Michal"', () => {
     const users = [
       { firstName: 'Michal', lastName: 'Nieruchalski' },
@@ -14,20 +14,28 @@ describe.skip('Filter: ne operator', () => {
       .toEqual([ { firstName: 'Jan', lastName: 'Kowalski' } ]);
   });
 
-  // These tests assume that not all of the objects are identical,
-  // Therefore if a property is missing we handle it instead of throwing an error.
-  it('should always return true if property does not exist', () => {
+  it('should return false if property does not exist', () => {
     const users = [{ firstName: 'Michal' }];
-    expect(filterArray(users, 'lastName ne null')).toEqual([{ firstName: 'Michal' }]);
+    expect(filterArray(users, 'lastName ne "Goliat"')).toEqual([]);
   });
 
-  it('should always return true when undefined ne null', () => {
+  it('should return true when undefined ne null', () => {
     const users = [{ firstName: 'Michal', lastName: undefined }];
-    expect(filterArray(users, 'lastName ne null')).toEqual([{ firstName: 'Michal' }]);
+    expect(filterArray(users, 'lastName ne null')).toEqual([{ firstName: 'Michal', lastName: undefined }]);
   });
 
-  it('should always return true when undefined ne null', () => {
-    const users = [{ firstName: 'Michal', lastName: undefined }];
-    expect(filterArray(users, 'lastName ne null')).toEqual([{ firstName: 'Michal' }]);
+  it('should return false when null ne null', () => {
+    const users = [{ firstName: 'Michal', lastName: null }];
+    expect(filterArray(users, 'lastName ne null')).toEqual([]);
+  });
+
+  it('age ne 25', () => {
+    const users = [{ age: 25 }, { age: 30 }];
+    expect(filterArray(users, 'age ne 25')).toEqual([{ age: 30 }]);
+  });
+
+  it('active ne true', () => {
+    const users = [{ active: true }, { active: false }];
+    expect(filterArray(users, 'active ne true')).toEqual([{ active: false }]);
   });
 });

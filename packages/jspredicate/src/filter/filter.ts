@@ -14,6 +14,8 @@ export const createFilter = <T extends object>(rule: string): Predicate<T> => {
 const matches = <T>(record: T, filter: Filter): boolean => {
   if (filter.operator === 'eq') {
     return eq(getFieldValue(record, filter.attribute), filter.value);
+  } else if (filter.operator === 'ne') {
+    return ne(getFieldValue(record, filter.attribute), filter.value);
   } else if (filter.operator === 'co') {
     return co(getFieldValue(record, filter.attribute), filter.value);
   } else if (filter.operator === 'sw') {
@@ -70,6 +72,17 @@ const getFieldValue = (record: any, attribute: Attribute): Optional<FieldValue> 
  */
 const eq = (fieldValue: Optional<FieldValue>, filterValue: FilterValue): boolean =>
   Optional.match(fieldValue, (v) => v === filterValue);
+
+/**
+ * Tests strict inequality between a field value and a filter value.
+ * If the field is absent, returns `false` (SQL NULL semantics).
+ *
+ * @param fieldValue - The value extracted from the record at the attribute path, wrapped in Optional.
+ * @param filterValue - The value from the filter rule to compare against.
+ * @returns `true` if the field value is present and strictly not equal to the filter value, `false` otherwise.
+ */
+const ne = (fieldValue: Optional<FieldValue>, filterValue: FilterValue): boolean =>
+  Optional.match(fieldValue, (v) => v !== filterValue);
 
 /**
  * Tests whether a field value is present and non-empty.
