@@ -4,7 +4,7 @@ import { createFilter } from '../../filter.js';
 const filterArray = (array: Array<object>, filter: string) =>
   array.filter(createFilter(filter));
 
-describe.skip('Filter: sw operator', () => {
+describe('Filter: sw operator', () => {
   it('firstName sw "Mi"', () => {
     const users = [
       { firstName: 'Michal', lastName: 'Nieruchalski' },
@@ -23,15 +23,14 @@ describe.skip('Filter: sw operator', () => {
       .toEqual([ { firstName: 'Michal', lastName: 'Nieruchalski' } ]);
   });
 
-  it('sw should be case sensitive firstName sw "mi"', () => {
-    const users = [{ firstName: 'Michal' },];
-    expect(filterArray(users, 'firstName sw "mi"')).toEqual([]);
+  it('sw should be case insensitive firstName sw "mi"', () => {
+    const users = [{ firstName: 'Michal' }];
+    expect(filterArray(users, 'firstName sw "mi"')).toEqual([{ firstName: 'Michal' }]);
   });
 
-  it('should throw error when sw operator value is not a string', () => {
+  it('should return false when sw operator value is not a string', () => {
     const users = [{ firstName: 'Michal', lastName: 'Nieruchalski' }];
-    expect(() => filterArray(users, 'firstName sw 123'))
-      .toThrow('Value for \'sw\' operator has to be a string. 123 is not a string.');
+    expect(filterArray(users, 'firstName sw 123')).toEqual([]);
   });
 
   it('should return false when attribute is not present', () => {

@@ -16,6 +16,10 @@ const matches = <T>(record: T, filter: Filter): boolean => {
     return eq(getFieldValue(record, filter.attribute), filter.value);
   } else if (filter.operator === 'co') {
     return co(getFieldValue(record, filter.attribute), filter.value);
+  } else if (filter.operator === 'sw') {
+    return sw(getFieldValue(record, filter.attribute), filter.value);
+  } else if (filter.operator === 'ew') {
+    return ew(getFieldValue(record, filter.attribute), filter.value);
   } else if (filter.operator === 'pr') {
     return pr(getFieldValue(record, filter.attribute));
   } else if (filter.operator === 'valuePath') {
@@ -122,6 +126,44 @@ const co = (fieldValue: Optional<FieldValue>, filterValue: FilterValue): boolean
       return false;
     }
     return v.toLowerCase().includes(filterValue.toLowerCase());
+  });
+};
+
+/**
+ * Tests whether a field value starts with the filter value, using case-insensitive comparison.
+ *
+ * @param fieldValue - The value extracted from the record at the attribute path, wrapped in Optional.
+ * @param filterValue - The value from the filter rule to match against the start of the field value.
+ * @returns `true` if both values are strings and the field value starts with the filter value, `false` otherwise.
+ */
+const sw = (fieldValue: Optional<FieldValue>, filterValue: FilterValue): boolean => {
+  if (typeof filterValue !== 'string') {
+    return false;
+  }
+  return Optional.match(fieldValue, (v) => {
+    if (typeof v !== 'string') {
+      return false;
+    }
+    return v.toLowerCase().startsWith(filterValue.toLowerCase());
+  });
+};
+
+/**
+ * Tests whether a field value ends with the filter value, using case-insensitive comparison.
+ *
+ * @param fieldValue - The value extracted from the record at the attribute path, wrapped in Optional.
+ * @param filterValue - The value from the filter rule to match against the end of the field value.
+ * @returns `true` if both values are strings and the field value ends with the filter value, `false` otherwise.
+ */
+const ew = (fieldValue: Optional<FieldValue>, filterValue: FilterValue): boolean => {
+  if (typeof filterValue !== 'string') {
+    return false;
+  }
+  return Optional.match(fieldValue, (v) => {
+    if (typeof v !== 'string') {
+      return false;
+    }
+    return v.toLowerCase().endsWith(filterValue.toLowerCase());
   });
 };
 
