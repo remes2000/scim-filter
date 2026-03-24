@@ -22,6 +22,8 @@ const matches = <T>(record: T, filter: Filter): boolean => {
     return sw(getFieldValue(record, filter.attribute), filter.value);
   } else if (filter.operator === 'ew') {
     return ew(getFieldValue(record, filter.attribute), filter.value);
+  } else if (filter.operator === 'gt') {
+    return gt(getFieldValue(record, filter.attribute), filter.value);
   } else if (filter.operator === 'pr') {
     return pr(getFieldValue(record, filter.attribute));
   } else if (filter.operator === 'valuePath') {
@@ -179,6 +181,17 @@ const ew = (fieldValue: Optional<FieldValue>, filterValue: FilterValue): boolean
     return v.toLowerCase().endsWith(filterValue.toLowerCase());
   });
 };
+
+const gt = (fieldValue: Optional<FieldValue>, filterValue: FilterValue): boolean =>
+  Optional.match(fieldValue, (v) => {
+    if (typeof filterValue === 'string') {
+      // todo: handle dates
+      return typeof v === 'string' && v.toLowerCase() > filterValue.toLowerCase();
+    } else if (typeof filterValue === 'number') {
+      return typeof v === 'number' && v > filterValue;
+    }
+    return false;
+  })
 
 /**
  * Tests whether a record satisfies both filter conditions (logical AND).
