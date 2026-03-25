@@ -26,6 +26,8 @@ const matches = <T>(record: T, filter: Filter): boolean => {
     return ew(getFieldValue(record, filter.attribute), filter.value);
   } else if (filter.operator === 'gt') {
     return gt(getFieldValue(record, filter.attribute), filter.value);
+  } else if (filter.operator === 'lt') {
+    return lt(getFieldValue(record, filter.attribute), filter.value);
   } else if (filter.operator === 'pr') {
     return pr(getFieldValue(record, filter.attribute));
   } else if (filter.operator === 'valuePath') {
@@ -217,6 +219,22 @@ const compareWith = (compare: Comparator) => (fieldValue: Optional<FieldValue>, 
  * @returns `true` if the field value is present and greater than the filter value, `false` otherwise.
  */
 const gt = compareWith((a, b) => a > b);
+
+/**
+ * Tests whether a field value is less than the filter value.
+ *
+ * For strings, compares using case-insensitive lexicographic ordering,
+ * unless the filter value is a valid ISO 8601 date-time string with a full date prefix (YYYY-MM-DD) -
+ * in which case, compares by parsed date (the field value must also be a valid date string).
+ * This requirement for a full date prefix prevents bare numbers or partial strings
+ * from accidentally triggering date comparison.
+ * For numbers, uses standard numeric comparison.
+ *
+ * @param fieldValue - The value extracted from the record at the attribute path, wrapped in Optional.
+ * @param filterValue - The value from the filter rule to compare against.
+ * @returns `true` if the field value is present and less than the filter value, `false` otherwise.
+ */
+const lt = compareWith((a, b) => a < b);
 
 /**
  * Tests whether a record satisfies both filter conditions (logical AND).
