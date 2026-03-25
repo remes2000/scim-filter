@@ -24,51 +24,78 @@ const SECOND = '(?<second>[0-9]{2})';
 const MS     = '(?<ms>[0-9]{3})';
 const TZ     = '(?<tz>Z|[+-][0-9]{2}:[0-9]{2})';
 
-const DATE_PART = `${YEAR}(?:-${MONTH}(?:-${DAY})?)?`;
-const TIME_PART = `${HOUR}:${MINUTE}(?::${SECOND}(?:\\.${MS})?)?`;
+const YEAR_RE = new RegExp(`^${YEAR}$`);
+const YEAR_MONTH_RE = new RegExp(`^${YEAR}-${MONTH}$`);
+const DATE_RE = new RegExp(`^${YEAR}-${MONTH}-${DAY}$`);
 
-const DATE_ONLY_RE = new RegExp(`^${DATE_PART}$`);
-const DATE_TIME_RE = new RegExp(`^${DATE_PART}T${TIME_PART}${TZ}?$`);
+const DATE_TIME_HOUR_MINUTE = new RegExp(`^${YEAR}-${MONTH}-${DAY}T${HOUR}:${MINUTE}${TZ}?$`);
+const DATE_TIME_HOUR_MINUTE_SECONDS = new RegExp(`^${YEAR}-${MONTH}-${DAY}T${HOUR}:${MINUTE}:${SECOND}${TZ}?$`);
+const DATE_TIME_HOUR_MINUTE_SECONDS_MS = new RegExp(`^${YEAR}-${MONTH}-${DAY}T${HOUR}:${MINUTE}:${SECOND}\\.${MS}${TZ}?$`);
+
+const REGS = [ YEAR_RE, YEAR_MONTH_RE, DATE_RE, DATE_TIME_HOUR_MINUTE, DATE_TIME_HOUR_MINUTE_SECONDS, DATE_TIME_HOUR_MINUTE_SECONDS_MS ];
+
+function execFirst(date: string): RegExpExecArray | null {
+  for (const reg of REGS) {
+    const m = reg.exec(date);
+    if (m !== null) return m;
+  }
+  return null;
+}
 
 export function isValidDateString(date: string): boolean {
-  const m = DATE_TIME_RE.exec(date) ?? DATE_ONLY_RE.exec(date);
-  if (!m) return false;
+  const match = execFirst(date);
+  if (match === null) return false;
 
-  const { year, month, day, hour, minute, second, tz } = m.groups!;
+  const { year, month, day, hour, minute, second, ms, tz } = match.groups!;
 
-  if (year === '-000000') return false;
-  if (month  && (n(month)  < 1  || n(month)  > 12)) return false;
-  if (day    && (n(day)    < 1  || n(day)    > 31)) return false;
-  if (hour   && (n(hour)   > 24)) return false;
-  if (minute && (n(minute) > 59)) return false;
-  if (second && (n(second) > 59)) return false;
+  if (year === '-000000') {
+    return false;
+  }
+  if (month && ( parseInt(month) < 1 || parseInt(month) > 12 ))  {
+    return false; 
+  }
+  if (day) {
+    const maxDay = daysInMonth(parseInt(year), parseInt(month)); 
+    if (parseInt(day) < 1 || parseInt(day) > maxDay) {
+      return false;
+    }
+  }
+  if (hour && parseInt(hour) > 24) {
+    return false;
+  }
+  if (minute && parseInt(minute) > 59) {
+    return false;
+  }
+  if (second && parseInt(second) > 59) {
+    return false;
+  }
+  if (ms && parseInt(ms) > 999) {
+    return false;
+  }
 
   // 24 is only valid as 24:00[:00[.000]]
-  if (hour && n(hour) === 24 && (n(minute) !== 0 || n(second ?? '0') !== 0)) return false;
-
-  // Calendar validation: check days per month (including leap years)
-  if (month && day) {
-    if (n(day) > daysInMonth(n(year), n(month))) return false;
+  if (hour && parseInt(hour) === 24) {
+   if (parseInt(minute) !== 0 || parseInt(second ?? '0') !== 0 || parseInt(ms ?? '000') !== 0)  {
+    return false;
+   }
   }
 
   if (tz && tz !== 'Z') {
     const [tzHour, tzMinute] = tz.slice(1).split(':');
-    if (n(tzHour) > 23 || n(tzMinute) > 59) return false;
+    if (parseInt(tzHour) > 23 || parseInt(tzMinute) > 59) {
+      return false;
+    }
   }
 
   return true;
 }
 
 function daysInMonth(year: number, month: number): number {
-  const days = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  const days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
   if (month === 2 && isLeapYear(year)) return 29;
-  return days[month];
+  return days[month - 1];
 }
 
 function isLeapYear(year: number): boolean {
   return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
-}
-
-function n(s: string): number {
-  return parseInt(s, 10);
 }

@@ -46,6 +46,28 @@ describe('isValidDateString', () => {
     it('accepts day 29 in February in a leap year', () => {
       expect(isValidDateString('2024-02-29')).toBe(true);
     });
+
+    // Leap year 
+    it('accepts 4 AD as a leap year', () => {
+      expect(isValidDateString('0004-02-29')).toBe(true);
+    });
+
+    it('rejects 1 AD as a leap year', () => {
+      expect(isValidDateString('0001-02-29')).toBe(false);
+    });
+
+    it('accepts 1 BC as a leap year', () => {
+      expect(isValidDateString('+000000-02-29')).toBe(true);
+      expect(isValidDateString('0000-02-29')).toBe(true);
+    });
+
+    it('rejects 301 BC as a leap year', () => {
+      expect(isValidDateString('-000300-02-29')).toBe(false);
+    });
+
+    it('accepts 401 BC as a leap year', () => {
+      expect(isValidDateString('-000400-02-29')).toBe(true);
+    });
   
     it('rejects 3-digit year', () => {
       expect(isValidDateString('202')).toBe(false);
