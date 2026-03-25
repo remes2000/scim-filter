@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isValidDateString } from '../date.js';
+import { isValidDateString, isValidFullDateString } from '../date.js';
 
 describe('isValidDateString', () => {
   describe('date-only formats', () => {
@@ -219,6 +219,52 @@ describe('isValidDateString', () => {
 
     it('rejects partial time without minutes', () => {
       expect(isValidDateString('2023-06-15T10')).toBe(false);
+    });
+  });
+});
+
+describe('isValidFullDateString', () => {
+  describe('accepts full dates (YYYY-MM-DD)', () => {
+    it('accepts YYYY-MM-DD', () => {
+      expect(isValidFullDateString('2023-06-15')).toBe(true);
+    });
+
+    it('accepts YYYY-MM-DD with time', () => {
+      expect(isValidFullDateString('2023-06-15T10:30')).toBe(true);
+    });
+
+    it('accepts YYYY-MM-DD with full datetime', () => {
+      expect(isValidFullDateString('2023-06-15T10:30:45.123Z')).toBe(true);
+    });
+
+    it('accepts expanded year with full date', () => {
+      expect(isValidFullDateString('+100000-01-01')).toBe(true);
+    });
+
+    it('accepts negative expanded year with full date', () => {
+      expect(isValidFullDateString('-100000-01-01')).toBe(true);
+    });
+
+    it('accepts leap day', () => {
+      expect(isValidFullDateString('2024-02-29')).toBe(true);
+    });
+  });
+
+  describe('rejects partial dates', () => {
+    it('rejects YYYY only', () => {
+      expect(isValidFullDateString('2023')).toBe(false);
+    });
+
+    it('rejects YYYY-MM only', () => {
+      expect(isValidFullDateString('2023-06')).toBe(false);
+    });
+
+    it('rejects YYYY with time', () => {
+      expect(isValidFullDateString('2024T12:00')).toBe(false);
+    });
+
+    it('rejects YYYY-MM with time', () => {
+      expect(isValidFullDateString('2024-01T12:00')).toBe(false);
     });
   });
 });

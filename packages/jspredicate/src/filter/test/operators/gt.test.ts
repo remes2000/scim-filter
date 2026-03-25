@@ -54,8 +54,7 @@ describe('Filter: gt operator', () => {
     });
   });
 
-  // TODO: handle datetime
-  describe.skip('datetime (stored as string)', () => {
+  describe('datetime (stored as string)', () => {
     describe('when filter value is a valid date', () => {
       it('should return false when attribute value is less than the filter value', () => {
         const users = [{ createdAt: '2020-01-01T00:00:00Z' }];
@@ -86,6 +85,18 @@ describe('Filter: gt operator', () => {
         const users = [{ createdAt: true }];
         expect(filterArray(users, 'createdAt gt "2023-01-01T00:00:00Z"')).toEqual([]);
       });
+    });
+  });
+
+  describe('string that looks like a partial date (uses lexicographic order)', () => {
+    it('should use lexicographic comparison for bare year "2025"', () => {
+      const users = [{ code: '2025a' }, { code: '2025b' }];
+      expect(filterArray(users, 'code gt "2025"')).toEqual([{ code: '2025a' }, { code: '2025b' }]);
+    });
+
+    it('should use lexicographic comparison for year-month "2025-01"', () => {
+      const users = [{ code: '2025-01a' }, { code: '2025-01b' }];
+      expect(filterArray(users, 'code gt "2025-01"')).toEqual([{ code: '2025-01a' }, { code: '2025-01b' }]);
     });
   });
 

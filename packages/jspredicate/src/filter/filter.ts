@@ -1,5 +1,6 @@
 import { Filter, Parser } from '@scim-filter/parse';
 import { Optional } from './optional.js';
+import * as DateValidator from '../date/date.js';
 
 type Predicate<T> = (record: T, index: number, array: T[]) => boolean;
 type Attribute = Array<string>;
@@ -182,11 +183,31 @@ const ew = (fieldValue: Optional<FieldValue>, filterValue: FilterValue): boolean
   });
 };
 
+/**
+ * Tests whether a field value is greater than the filter value.
+ *
+ * For strings, compares using case-insensitive lexicographic ordering,
+ * unless the filter value is a valid ISO 8601 date-time string with a full date prefix (YYYY-MM-DD) -
+ * in which case, compares by parsed date (the field value must also be a valid date string).
+ * This requirement for a full date prefix prevents bare numbers or partial strings
+ * from accidentally triggering date comparison.
+ * For numbers, uses standard numeric comparison.
+ *
+ * @param fieldValue - The value extracted from the record at the attribute path, wrapped in Optional.
+ * @param filterValue - The value from the filter rule to compare against.
+ * @returns `true` if the field value is present and greater than the filter value, `false` otherwise.
+ */
 const gt = (fieldValue: Optional<FieldValue>, filterValue: FilterValue): boolean =>
   Optional.match(fieldValue, (v) => {
     if (typeof filterValue === 'string') {
-      // todo: handle dates
-      return typeof v === 'string' && v.toLowerCase() > filterValue.toLowerCase();
+      if (typeof v !== 'string') {
+        return false;
+      }
+      const shouldUseDateComparison = DateValidator.isValidFullDateString(filterValue);
+
+      return shouldUseDateComparison 
+       ? DateValidator.isValidDateString(v) && Date.parse(v) > Date.parse(filterValue)
+       : v.toLowerCase() > filterValue.toLowerCase();
     } else if (typeof filterValue === 'number') {
       return typeof v === 'number' && v > filterValue;
     }

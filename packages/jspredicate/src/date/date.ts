@@ -26,6 +26,7 @@ const TZ     = '(?<tz>Z|[+-][0-9]{2}:[0-9]{2})';
 
 const DATE_PART = `${YEAR}(-${MONTH}(-${DAY})?)?`;
 
+const FULL_DATE_PREFIX_RE = new RegExp(`^${YEAR}-${MONTH}-${DAY}.*`);
 const DATE_ONLY_RE = new RegExp(`^${DATE_PART}$`);
 const DATE_TIME_HM    = new RegExp(`^${DATE_PART}T${HOUR}:${MINUTE}${TZ}?$`);
 const DATE_TIME_HMS   = new RegExp(`^${DATE_PART}T${HOUR}:${MINUTE}:${SECOND}${TZ}?$`);
@@ -41,7 +42,17 @@ function execFirst(date: string): RegExpExecArray | null {
   return null;
 }
 
-export function isValidDateString(date: string): boolean {
+function daysInMonth(year: number, month: number): number {
+  const days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  if (month === 2 && isLeapYear(year)) return 29;
+  return days[month - 1];
+}
+
+function isLeapYear(year: number): boolean {
+  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+}
+
+function isValidDateString(date: string): boolean {
   const match = execFirst(date);
   if (match === null) return false;
 
@@ -89,12 +100,11 @@ export function isValidDateString(date: string): boolean {
   return true;
 }
 
-function daysInMonth(year: number, month: number): number {
-  const days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-  if (month === 2 && isLeapYear(year)) return 29;
-  return days[month - 1];
+function isValidFullDateString(date: string) {
+  return isValidDateString(date) && FULL_DATE_PREFIX_RE.test(date);
 }
 
-function isLeapYear(year: number): boolean {
-  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+export {
+  isValidDateString,
+  isValidFullDateString
 }
