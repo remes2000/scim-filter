@@ -182,6 +182,28 @@ describe('isValidDateString', () => {
     });
   });
 
+  describe('date-time with partial date (YYYY or YYYY-MM before T)', () => {
+    it('accepts YYYY T HH:mm', () => {
+      expect(isValidDateString('2024T12:00')).toBe(true);
+    });
+
+    it('accepts YYYY T HH:mm with Z', () => {
+      expect(isValidDateString('2024T12:00Z')).toBe(true);
+    });
+
+    it('accepts YYYY-MM T HH:mm', () => {
+      expect(isValidDateString('2024-01T12:00')).toBe(true);
+    });
+
+    it('accepts YYYY-MM T HH:mm:ss', () => {
+      expect(isValidDateString('2024-01T12:00:00')).toBe(true);
+    });
+
+    it('accepts YYYY-MM T HH:mm:ss.sss with Z', () => {
+      expect(isValidDateString('2024-01T12:00:00.000Z')).toBe(true);
+    });
+  });
+
   describe('invalid input', () => {
     it('rejects empty string', () => {
       expect(isValidDateString('')).toBe(false);

@@ -24,15 +24,14 @@ const SECOND = '(?<second>[0-9]{2})';
 const MS     = '(?<ms>[0-9]{3})';
 const TZ     = '(?<tz>Z|[+-][0-9]{2}:[0-9]{2})';
 
-const YEAR_RE = new RegExp(`^${YEAR}$`);
-const YEAR_MONTH_RE = new RegExp(`^${YEAR}-${MONTH}$`);
-const DATE_RE = new RegExp(`^${YEAR}-${MONTH}-${DAY}$`);
+const DATE_PART = `${YEAR}(-${MONTH}(-${DAY})?)?`;
 
-const DATE_TIME_HOUR_MINUTE = new RegExp(`^${YEAR}-${MONTH}-${DAY}T${HOUR}:${MINUTE}${TZ}?$`);
-const DATE_TIME_HOUR_MINUTE_SECONDS = new RegExp(`^${YEAR}-${MONTH}-${DAY}T${HOUR}:${MINUTE}:${SECOND}${TZ}?$`);
-const DATE_TIME_HOUR_MINUTE_SECONDS_MS = new RegExp(`^${YEAR}-${MONTH}-${DAY}T${HOUR}:${MINUTE}:${SECOND}\\.${MS}${TZ}?$`);
+const DATE_ONLY_RE = new RegExp(`^${DATE_PART}$`);
+const DATE_TIME_HM    = new RegExp(`^${DATE_PART}T${HOUR}:${MINUTE}${TZ}?$`);
+const DATE_TIME_HMS   = new RegExp(`^${DATE_PART}T${HOUR}:${MINUTE}:${SECOND}${TZ}?$`);
+const DATE_TIME_HMSMS = new RegExp(`^${DATE_PART}T${HOUR}:${MINUTE}:${SECOND}\\.${MS}${TZ}?$`);
 
-const REGS = [ YEAR_RE, YEAR_MONTH_RE, DATE_RE, DATE_TIME_HOUR_MINUTE, DATE_TIME_HOUR_MINUTE_SECONDS, DATE_TIME_HOUR_MINUTE_SECONDS_MS ];
+const REGS = [DATE_ONLY_RE, DATE_TIME_HM, DATE_TIME_HMS, DATE_TIME_HMSMS];
 
 function execFirst(date: string): RegExpExecArray | null {
   for (const reg of REGS) {
