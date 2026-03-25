@@ -6,6 +6,7 @@ type Predicate<T> = (record: T, index: number, array: T[]) => boolean;
 type Attribute = Array<string>;
 type FieldValue = any;
 type FilterValue = string | number | boolean | null;
+type Comparator = <T>(a: T, b: T) => boolean;
 
 export const createFilter = <T extends object>(rule: string): Predicate<T> => {
   const ast = new Parser(rule).parse();
@@ -183,6 +184,24 @@ const ew = (fieldValue: Optional<FieldValue>, filterValue: FilterValue): boolean
   });
 };
 
+const compareWith = (compare: Comparator) => (fieldValue: Optional<FieldValue>, filterValue: FilterValue): boolean => {
+  return Optional.match(fieldValue, (v) => {
+    if (typeof filterValue === 'string') {
+      if (typeof v !== 'string') {
+        return false;
+      }
+      const shouldUseDateComparison = DateValidator.isValidFullDateString(filterValue);
+
+      return shouldUseDateComparison 
+       ? DateValidator.isValidDateString(v) && compare(Date.parse(v), Date.parse(filterValue))
+       : compare(v.toLowerCase(), filterValue.toLowerCase());
+    } else if (typeof filterValue === 'number') {
+      return typeof v === 'number' && compare(v, filterValue);
+    }
+    return false;
+  })  
+};
+
 /**
  * Tests whether a field value is greater than the filter value.
  *
@@ -197,22 +216,7 @@ const ew = (fieldValue: Optional<FieldValue>, filterValue: FilterValue): boolean
  * @param filterValue - The value from the filter rule to compare against.
  * @returns `true` if the field value is present and greater than the filter value, `false` otherwise.
  */
-const gt = (fieldValue: Optional<FieldValue>, filterValue: FilterValue): boolean =>
-  Optional.match(fieldValue, (v) => {
-    if (typeof filterValue === 'string') {
-      if (typeof v !== 'string') {
-        return false;
-      }
-      const shouldUseDateComparison = DateValidator.isValidFullDateString(filterValue);
-
-      return shouldUseDateComparison 
-       ? DateValidator.isValidDateString(v) && Date.parse(v) > Date.parse(filterValue)
-       : v.toLowerCase() > filterValue.toLowerCase();
-    } else if (typeof filterValue === 'number') {
-      return typeof v === 'number' && v > filterValue;
-    }
-    return false;
-  })
+const gt = compareWith((a, b) => a > b);
 
 /**
  * Tests whether a record satisfies both filter conditions (logical AND).
