@@ -4,6 +4,22 @@ import { ScimFilterError } from "@scim-filter/parse";
 import { SAMPLE_DATA } from "./data";
 import "./App.css";
 
+const EXAMPLE_FILTERS = [
+  'firstName eq "Michal"',
+  'age gt 30',
+  'address.city eq "Poznan"',
+  'lastName sw "K"',
+  'age ge 30 and address.city eq "Krakow"',
+];
+
+function ExampleFilter({ filter, onClick }: { filter: string; onClick: (filter: string) => void }) {
+  return (
+    <li>
+      <code className="example-filter" onClick={() => onClick(filter)}>{filter}</code>
+    </li>
+  );
+}
+
 function App() {
   const [filter, setFilter] = useState('');
 
@@ -56,20 +72,11 @@ function App() {
           <p>Try these filters:</p>
           <ul>
             <li>
-              <code>firstName eq "Michal"</code>
+              <button className="clear-filter" onClick={() => setFilter('')}>Clear</button>
             </li>
-            <li>
-              <code>age gt 30</code>
-            </li>
-            <li>
-              <code>address.city eq "Poznan"</code>
-            </li>
-            <li>
-              <code>lastName sw "K"</code>
-            </li>
-            <li>
-              <code>age ge 30 and address.city eq "Krakow"</code>
-            </li>
+            {EXAMPLE_FILTERS.map((f) => (
+              <ExampleFilter key={f} filter={f} onClick={setFilter} />
+            ))}
           </ul>
         </div>
       </div>
