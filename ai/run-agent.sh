@@ -1,8 +1,10 @@
 #!/bin/bash
 set -e
 
-TASK="$1"
-BRANCH="agent/$(date +%s)"
+echo "Enter prompt (press Ctrl+D when done):"
+TASK=$(cat)
+read -r -p "Enter branch name (will be prefixed with 'agent/'): " BRANCH_NAME
+BRANCH="agent/$BRANCH_NAME"
 WORKTREE="./$BRANCH"
 
 # create a new branch + worktree
