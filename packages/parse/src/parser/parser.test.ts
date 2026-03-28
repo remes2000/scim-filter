@@ -20,42 +20,32 @@ describe('Parser', () => {
   it('should parse expression with AND operator', () => {
     check('userName eq "john" and age lt 25', {
       operator: 'and',
-      filters: [
-        { attribute: ['userName'], operator: 'eq', value: 'john' },
-        { attribute: ['age'], operator: 'lt', value: 25 }
-      ]
+      left: { attribute: ['userName'], operator: 'eq', value: 'john' },
+      right: { attribute: ['age'], operator: 'lt', value: 25 }
     });
   });
 
   it('should parse complex expression with operator precedence', () => {
     check('userName eq "john" or userName eq "mike" and age lt 30', {
       operator: 'or',
-      filters: [
-        { attribute: ['userName'], operator: 'eq', value: 'john' },
-        {
-          operator: 'and',
-          filters: [
-            { attribute: ['userName'], operator: 'eq', value: 'mike' },
-            { attribute: ['age'], operator: 'lt', value: 30 },
-          ]
-        }
-      ]
+      left: { attribute: ['userName'], operator: 'eq', value: 'john' },
+      right: {
+        operator: 'and',
+        left: { attribute: ['userName'], operator: 'eq', value: 'mike' },
+        right: { attribute: ['age'], operator: 'lt', value: 30 },
+      }
     });
   });
 
   it('should parse expression with parentheses grouping', () => {
     check('(userName eq "john" or userName eq "mike") and age lt 30', {
       operator: 'and',
-      filters: [
-        {
-          operator: 'or',
-          filters: [
-            { attribute: ['userName'], operator: 'eq', value: 'john' },
-            { attribute: ['userName'], operator: 'eq', value: 'mike' }
-          ]
-        },
-        { attribute: ['age'], operator: 'lt', value: 30 }
-      ]
+      left: {
+        operator: 'or',
+        left: { attribute: ['userName'], operator: 'eq', value: 'john' },
+        right: { attribute: ['userName'], operator: 'eq', value: 'mike' }
+      },
+      right: { attribute: ['age'], operator: 'lt', value: 30 }
     });
   });
 
@@ -66,7 +56,7 @@ describe('Parser', () => {
   it('should parse expression with not operator', () => {
     check('not (userName eq "john")', {
       operator: 'not',
-      filters: [{ attribute: ['userName'], operator: 'eq', value: 'john' }]
+      filter: { attribute: ['userName'], operator: 'eq', value: 'john' }
     });
   });
 
@@ -78,13 +68,11 @@ describe('Parser', () => {
    check('emails[type eq "work" and value co "@example.com"]', {
       attribute: ['emails'],
       operator: 'valuePath',
-      filters: [{
+      filter: {
         operator: 'and',
-        filters: [
-          { attribute: ['type'], operator: 'eq', value: 'work' },
-          { attribute: ['value'], operator: 'co', value: '@example.com' }
-        ]
-      }]
+        left: { attribute: ['type'], operator: 'eq', value: 'work' },
+        right: { attribute: ['value'], operator: 'co', value: '@example.com' }
+      }
    });
   });
 

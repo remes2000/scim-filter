@@ -26,15 +26,16 @@ interface ComparisionAttributeExpression {
 interface ValuePathExpression {
   attribute: Attribute;
   operator: 'valuePath';
-  filters: [Filter]
+  filter: Filter;
 }
 
 interface LogicalExpression {
   operator: CompareLogicalOperator;
-  filters: [Filter, Filter];
+  left: Filter;
+  right: Filter;
 }
 
 interface NotExpression {
   operator: 'not';
-  filters: [Filter];
+  filter: Filter;
 }
