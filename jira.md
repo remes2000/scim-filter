@@ -2,10 +2,10 @@
 [ ] Improve the lexer, handle scim paths
 [ ] Setup library according to the article
 [ ] Publish it on npm
-[ ] Create basic js-filter implementation
-[ ] Add error type in js-filter
-[ ] Make sure on how should be case-sensitivity handled for string attributes
-[ ] Handle dates in gt, lt, gte, lte operators 
+[x] Create basic js-filter implementation
+~~[ ] Add error type in js-filter~~ We won't throw any errors
+[x] Make sure on how should be case-sensitivity handled for string attributes
+[x] Handle dates in gt, lt, gte, lte operators 
 [ ] Attribute names and attribute operators should be case insensitive
 [x] Use pnpm workspaces
 [x] Handle sub-attributes in parser
