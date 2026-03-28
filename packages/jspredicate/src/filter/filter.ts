@@ -35,13 +35,13 @@ const matches = <T>(record: T, filter: Filter): boolean => {
   } else if (filter.operator === 'pr') {
     return pr(getFieldValue(record, filter.attribute));
   } else if (filter.operator === 'valuePath') {
-    return valuePath(getFieldValue(record, filter.attribute), filter.filters[0]);
+    return valuePath(getFieldValue(record, filter.attribute), filter.filter);
   } else if (filter.operator === 'and') {
-    return and(record, filter.filters[0], filter.filters[1]);
+    return and(record, filter.left, filter.right);
   } else if (filter.operator === 'or') {
-    return or(record, filter.filters[0], filter.filters[1]);
+    return or(record, filter.left, filter.right);
   } else if (filter.operator === 'not') {
-    return not(record, filter.filters[0]);
+    return not(record, filter.filter);
   }
   return false;
 };

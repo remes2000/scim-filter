@@ -23,7 +23,7 @@ export class Parser {
     const orPredicate = (t: Token): t is IdentifierToken => isLogicalOperator(t) && t.value === 'or';
     if (this.walker.match(orPredicate)) {
       const right = this.andLogicalExpression();
-      return { operator: 'or', filters: [ expression, right ] };
+      return { operator: 'or', left: expression, right };
     }
 
     return expression;
@@ -35,7 +35,7 @@ export class Parser {
     const andPredicate = (t: Token): t is IdentifierToken => isLogicalOperator(t) && t.value === 'and';
     if (this.walker.match(andPredicate)) {
       const right = this.notLogicalExpression();
-      return { operator: 'and', filters: [expression, right] };
+      return { operator: 'and', left: expression, right };
     }
 
     return expression;
@@ -48,7 +48,7 @@ export class Parser {
       if (!group) {
         throw new ScimFilterError('Expected group after "not" operator');
       }
-      return { operator: 'not', filters: [group] };
+      return { operator: 'not', filter: group };
     }
 
     return this.attributeExpression();
@@ -63,7 +63,7 @@ export class Parser {
     const attribute = this.attribute();
     const valuePath = this.valuePath();
     if (valuePath) {
-      return { attribute, operator: 'valuePath', filters: [valuePath] }
+      return { attribute, operator: 'valuePath', filter: valuePath }
     }
 
     const { value: operator } = this.walker.consume(isOperator, 'Expected operator');
