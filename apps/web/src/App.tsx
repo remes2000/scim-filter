@@ -33,7 +33,7 @@ function App() {
 
   return (
     <div className="app">
-      <div className="panel panel-left">
+      <div className="search-panel">
         <h1>SCIM Filter Demo</h1>
         <p className="subtitle">
           Type a SCIM filter expression to filter the dataset in real time.
@@ -73,36 +73,34 @@ function App() {
           </ul>
         </div>
       </div>
-      <div className="panel panel-right">
-        <div className="cards">
-          {matched.map((item, i) => (
-            <div className="card" key={i}>
-              <div className="card-row">
-                <span className="key">firstName</span>
-                <span className="value string">"{item.firstName}"</span>
-              </div>
-              <div className="card-row">
-                <span className="key">lastName</span>
-                <span className="value string">"{item.lastName}"</span>
-              </div>
-              <div className="card-row">
-                <span className="key">age</span>
-                <span className="value number">{item.age}</span>
-              </div>
-              <div className="card-row">
-                <span className="key">address.city</span>
-                <span className="value string">"{item.address.city}"</span>
-              </div>
-              <div className="card-row">
-                <span className="key">address.street</span>
-                <span className="value string">"{item.address.street}"</span>
-              </div>
+      <div className="cards">
+        {matched.map((item, i) => (
+          <div className="card" key={i}>
+            <div className="card-row">
+              <span className="key">firstName</span>
+              <span className="value string">"{item.firstName}"</span>
             </div>
-          ))}
-          {matched.length === 0 && (
-            <div className="no-results">No items match the filter.</div>
-          )}
-        </div>
+            <div className="card-row">
+              <span className="key">lastName</span>
+              <span className="value string">"{item.lastName}"</span>
+            </div>
+            <div className="card-row">
+              <span className="key">age</span>
+              <span className="value number">{item.age}</span>
+            </div>
+            <div className="card-row">
+              <span className="key">address.city</span>
+              <span className="value string">"{item.address.city}"</span>
+            </div>
+            <div className="card-row">
+              <span className="key">address.street</span>
+              <span className="value string">"{item.address.street}"</span>
+            </div>
+          </div>
+        ))}
+        {matched.length === 0 && (
+          <div className="no-results">No items match the filter.</div>
+        )}
       </div>
     </div>
   );

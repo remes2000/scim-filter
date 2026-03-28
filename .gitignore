@@ -3,3 +3,4 @@ dist
 .env
 ai/agent
 .pnpm-store
+.playwright-cli
