@@ -1,25 +1,35 @@
 import { useMemo, useState } from "react";
 import { createFilter } from "@scim-filter/jspredicate";
+import { ScimFilterError } from "@scim-filter/parse";
 import { SAMPLE_DATA } from "./data";
 import "./App.css";
 
 function App() {
-  const [filter, setFilter] = useState("");
+  const [filter, setFilter] = useState('');
 
   const { matched, error } = useMemo(() => {
     if (!filter.trim()) {
       return { matched: SAMPLE_DATA, error: null };
     }
     try {
-      const predicate = createFilter(filter);
-      return { matched: SAMPLE_DATA.filter(predicate), error: null };
-    } catch (e) {
       return {
-        matched: SAMPLE_DATA,
-        error: e instanceof Error ? e.message : String(e),
+        matched: SAMPLE_DATA.filter(createFilter(filter)),
+        error: null 
       };
+    } catch (e) {
+      if (e instanceof ScimFilterError) {
+        return { 
+          matched: SAMPLE_DATA,
+          error: e.message
+        };
+      } else {
+        return {
+          matched: SAMPLE_DATA,
+          error: 'Unexpected error: ' + (e instanceof Error ? e.message : String(e))
+        };
+      }
     }
-  }, [filter]);
+  }, [ filter ]);
 
   return (
     <div className="app">
