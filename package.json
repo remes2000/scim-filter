@@ -4,8 +4,7 @@
   "scripts": {
     "build": "pnpm -r --filter=\"./packages/*\" --filter=\"./apps/*\" run build",
     "test": "vitest run",
-    "start": "vitest",
-    "ci": "pnpm build"
+    "start": "vitest"
   },
   "engines": {
     "node": ">=22.0.0",

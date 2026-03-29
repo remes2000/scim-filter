@@ -8,8 +8,7 @@
   "scripts": {
     "build": "tsc",
     "start": "vitest",
-    "test": "vitest run",
-    "ci": "pnpm build"
+    "test": "vitest run"
   },
   "keywords": [
     "SCIM",
